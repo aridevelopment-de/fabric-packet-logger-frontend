@@ -1,10 +1,10 @@
+import { Code } from "@mantine/core";
 import { TransferListData } from "@mantine/core/lib/TransferList/types";
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import styles from "./loglist.module.css";
 import { IBasePacket } from "./types";
-import { Code } from "@mantine/core";
 
 const LogList = (props: {
 	data: Array<IBasePacket>;

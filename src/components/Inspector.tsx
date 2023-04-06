@@ -1,8 +1,20 @@
-import { Text } from "@mantine/core";
+import { Code, Table, Text } from "@mantine/core";
 import React from "react";
 import { ADAPTERS } from "./adapters/adapters";
 import styles from "./inspector.module.css";
 import { IBasePacket, IDescription } from "./types";
+
+const COLORS = {
+  key: "rgb(209, 154, 102)",
+  string: "rgb(152, 195, 121)",
+  number: "rgb(209, 154, 102)",
+  boolean: "rgb(209, 154, 102)",
+  bigint: "rgb(200, 200, 200)",
+  symbol: "rgb(200, 200, 200)",
+  undefined: "rgb(200, 200, 200)",
+  object: "rgb(200, 200, 200)",
+  function: "rgb(200, 200, 200)",
+}
 
 const Inspector = (props: { selectedPacket: IBasePacket | null, descriptions: {[key: string]: IDescription} }) => {
 	if (props.selectedPacket === null) return null;
@@ -33,7 +45,38 @@ const Inspector = (props: { selectedPacket: IBasePacket | null, descriptions: {[
             </div>
           </div>
         )}
-        <div className={styles.fields}></div>
+        <div className={styles.fields}>
+          <Table>
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Value</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.keys(props.selectedPacket.data.data).map((key, index) => {
+                let value = props.selectedPacket!.data.data[key];
+                
+                if (typeof value === "object") {
+                  value = "Object"
+                }
+
+                const color = COLORS[typeof props.selectedPacket!.data.data[key]];
+                value = JSON.stringify(value);
+                
+                return (
+                  <tr key={index}>
+                    <td><Code style={{color: COLORS.key, fontFamily: "Jetbrains Mono"}}>{key}</Code></td>
+                    <td><Code style={{color: color, fontFamily: "Jetbrains Mono"}}>{value}</Code></td>
+                    {/* @ts-ignore */}
+                    <td>{description[key]}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </Table>
+        </div>
         {adapter !== undefined && (
           <div className={styles.extra}>
             <span className={styles.extraTitle}>Extra</span>
