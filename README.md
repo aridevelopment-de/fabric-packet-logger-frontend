@@ -29,7 +29,7 @@ The web-ui connects to the websocket server started by the client. A url paramet
 ## Previews
 
 Overview:
-![https://cdn.discordapp.com/attachments/598256161212596235/1093628762492514394/image.png](https://cdn.discordapp.com/attachments/598256161212596235/1093628762492514394/image.png)
+![https://cdn.discordapp.com/attachments/598256161212596235/1093634774763065475/image.png](https://cdn.discordapp.com/attachments/598256161212596235/1093634774763065475/image.png)
 
 MapUpdateAdapter:
-![https://cdn.discordapp.com/attachments/598256161212596235/1093628709556211863/image.png](https://cdn.discordapp.com/attachments/598256161212596235/1093628709556211863/image.png)
+![https://cdn.discordapp.com/attachments/598256161212596235/1093635306244280431/image.png](https://cdn.discordapp.com/attachments/598256161212596235/1093635306244280431/image.png)
