@@ -5,7 +5,7 @@
   box-shadow: 0 0 -10px 0 rgba(0, 0, 0, 0.5);
   padding: 2em;
   width: 30vw;
-  font-family: Segoe UI;
+  font-family: Segoe UI, sans-serif;
 }
 
 .header {
@@ -18,7 +18,7 @@
   text-decoration: none;
   color: white;
   margin-bottom: 0.5em;
-  font-family: "Jetbrains Mono"
+  font-family: "Jetbrains Mono", sans-serif;
 }
 
 .title:hover {
