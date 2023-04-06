@@ -67,8 +67,8 @@ const Inspector = (props: { selectedPacket: IBasePacket | null, descriptions: {[
                 
                 return (
                   <tr key={index}>
-                    <td><Code style={{color: COLORS.key, fontFamily: "Jetbrains Mono"}}>{key}</Code></td>
-                    <td><Code style={{color: color, fontFamily: "Jetbrains Mono"}}>{value}</Code></td>
+                    <td><Code style={{color: COLORS.key, fontFamily: "Jetbrains Mono, sans-serif"}}>{key}</Code></td>
+                    <td><Code style={{color: color, fontFamily: "Jetbrains Mono, sans-serif"}}>{value}</Code></td>
                     {/* @ts-ignore */}
                     <td>{description[key]}</td>
                   </tr>
