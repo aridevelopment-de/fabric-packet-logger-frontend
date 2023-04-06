@@ -1,0 +1,8 @@
+.canvas__wrapper {
+  display: grid;
+  place-items: center;
+}
+
+.canvas__wrapper > canvas {
+  transform: scale(2) translateY(50%);
+}

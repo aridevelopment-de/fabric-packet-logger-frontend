@@ -1,0 +1,19 @@
+.container {
+  position: sticky;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: fit-content; 
+  height: calc(100vh - 4em);
+  background-color: var(--darkened-background-color);
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  padding: 2em;
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+}
+
+.title {
+  font-size: 1.5em;
+  font-weight: 600;
+}

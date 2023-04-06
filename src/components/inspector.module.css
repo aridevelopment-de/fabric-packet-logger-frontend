@@ -1,0 +1,78 @@
+.container {
+  width: fit-content;
+  height: calc(100vh - 4em);
+  background-color: var(--darkened-background-color);
+  box-shadow: 0 0 -10px 0 rgba(0, 0, 0, 0.5);
+  padding: 2em;
+  width: 30vw;
+  font-family: Segoe UI;
+}
+
+.header {
+  margin-bottom: 2em;
+}
+
+.title {
+  display: block;
+  font-size: 1.4em;
+  text-decoration: none;
+  color: white;
+  margin-bottom: 0.5em;
+  font-family: "Jetbrains Mono"
+}
+
+.title:hover {
+  text-decoration: underline;
+  color: aquamarine;
+}
+
+.description {
+  display: inline-block;
+  line-height: 1.2;
+}
+
+.meta {
+  display: block;
+  font-size: 1.1em;
+  list-style: none;
+  padding-left: 0;
+  margin: 2em 0;
+}
+
+.meta b {
+  font-weight: 700;
+}
+
+.meta > span {
+  font-size: 1.4em;
+}
+
+.wikiVgEntry {
+  margin: 2em 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.wikiVgTitle {
+  background-color: var(--lightened-background-color);
+  border-bottom: 0;
+  border-top-left-radius: 13px;
+  border-top-right-radius: 13px;
+  padding: 0.5em;
+  width: fit-content;
+}
+
+.wikiVgContent {
+  border: 2px solid var(--lightened-background-color);
+  border-radius: 13px;
+  border-top-left-radius: 0;
+  padding: 1em;
+}
+
+.extra {
+
+}
+
+.extraTitle {
+  font-size: 1.4em;;
+}
