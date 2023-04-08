@@ -16,7 +16,7 @@ The web-ui connects to the websocket server started by the client. A url paramet
   - Packet Data highlighting
 - Packet Filter
   - Whitelist
-  - [ ] Blacklist
+  - Blacklist
 - Packet inspector
   - URL to wiki.vg section
   - Description of packet
