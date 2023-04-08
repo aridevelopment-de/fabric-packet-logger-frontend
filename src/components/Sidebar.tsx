@@ -1,4 +1,4 @@
-import { Button, Checkbox, Divider, MultiSelect } from "@mantine/core";
+import { Button, Checkbox, Divider, Group, MultiSelect, SegmentedControl } from "@mantine/core";
 import styles from "./sidebar.module.css";
 
 const Sidebar = (props: {
@@ -8,12 +8,14 @@ const Sidebar = (props: {
 	blacklistData: Array<string>;
 	autoScroll: boolean;
 	onlySaveFiltered: boolean;
+	loggingState: string;
 	setWhitelistData: (value: Array<string>) => void;
 	setBlacklistData: (value: Array<string>) => void;
 	onReconnect: () => void;
 	onClear: () => void;
 	onAutoScroll: (value: boolean) => void;
 	onOnlySaveFiltered: (value: boolean) => void;
+	onLoggingState: (value: string) => void;
 }) => {
 	return (
 		<div className={styles.container}>
@@ -26,10 +28,21 @@ const Sidebar = (props: {
 				</span>
 			</div>
 			<div className={styles.action_group}>
-				<Button onClick={props.onReconnect}>Reconnect</Button>
-				<Button color="red" onClick={props.onClear}>
-					Clear
-				</Button>
+				<SegmentedControl 
+					data={[
+						{ label: "Logging", value: "logging", },
+						{ label: "Not logging", value: "off" }
+					]}
+					value={props.loggingState}
+					onChange={props.onLoggingState}
+					style={{width: "fit-content"}}
+				/>
+				<Group spacing="md">
+					<Button onClick={props.onReconnect}>Reconnect</Button>
+					<Button color="red" onClick={props.onClear}>
+						Clear
+					</Button>
+				</Group>
 			</div>
 			<Divider my="xl" />
 			<div className={styles.packet_whitelist}>

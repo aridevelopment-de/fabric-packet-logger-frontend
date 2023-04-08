@@ -18,11 +18,12 @@ function App() {
 	const [selectedPacket, setSelectedPacket] = useState<number | null>(null);
 	const [autoScroll, setAutoScroll] = useState<boolean>(false);
 	const [onlySaveFiltered, setOnlySaveFiltered] = useState<boolean>(false);
+	const [logState, setLogState] = useState<string>("off");
 
 	const onMessage = useCallback((event: MessageEvent) => {
 		const data = JSON.parse(event.data);
 
-		if (data.allPackets === undefined) {
+		if (data.type === "packet") {
 			if (!onlySaveFiltered) {
 				setData((prevData) => {
 					return [
@@ -85,12 +86,13 @@ function App() {
 		ws.addEventListener("message", (event) => {
 			const data = JSON.parse(event.data);
 
-
-			if (data.allPackets !== undefined) {
+			if (data.type === "init") {
 				setAllPackets(data.allPackets);
 				setDescriptionData(data.descriptions);
 	
 				console.log(data.allPackets);
+			} else if (data.type === "loggingState") {
+				setLogState(data.state);
 			}
 		})
 
@@ -121,6 +123,7 @@ function App() {
 				whitelistData={whitelistData}
 				blacklistData={blacklistData}
 				autoScroll={autoScroll}
+				loggingState={logState}
 				onlySaveFiltered={onlySaveFiltered}
 				setWhitelistData={setWhitelistData}
 				setBlacklistData={setBlacklistData}
@@ -128,6 +131,15 @@ function App() {
 				onClear={() => setData([])}
 				onAutoScroll={(value) => setAutoScroll(value)}
 				onOnlySaveFiltered={(value) => setOnlySaveFiltered(value)}
+				onLoggingState={(value) => {
+					if (ws) {
+						setLogState(value);
+						ws.send(JSON.stringify({
+							type: "loggingState",
+							state: value
+						}))
+					}
+				}}
 			/>
 			<div
 				style={{
