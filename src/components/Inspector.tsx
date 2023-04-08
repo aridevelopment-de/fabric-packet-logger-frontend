@@ -26,6 +26,10 @@ const Inspector = (props: {data: IBasePacket[]}) => {
   if (selectedPacketId === null) return null;
 
   const selectedPacket = props.data[selectedPacketId];
+
+  // To prevent racing conditions
+  if (selectedPacket === undefined) return null;
+
   // @ts-ignore
   const adapter: any = ADAPTERS[selectedPacket.data.id];
   const description: IDescription = packetDescriptions[selectedPacket.data.id];

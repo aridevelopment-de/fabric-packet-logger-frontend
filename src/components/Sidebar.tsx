@@ -24,12 +24,13 @@ const Sidebar = (props: { onReconnect: () => void, setData: (newData: IBasePacke
 		state.setOnlySaveFiltered,
 	]);
 
-	const [ws, connected, logState, registeredPackets, setLogState] = useSession((state) => [
+	const [ws, connected, logState, registeredPackets, setLogState, setSelectedPacket] = useSession((state) => [
 		state.ws,
 		state.connected,
 		state.logState,
 		state.registeredPackets,
 		state.setLogState,
+		state.setSelectedPacket
 	]);
 
 	return (
@@ -60,7 +61,10 @@ const Sidebar = (props: { onReconnect: () => void, setData: (newData: IBasePacke
 				/>
 				<Group spacing="md">
 					<Button onClick={props.onReconnect}>Reconnect</Button>
-					<Button color="red" onClick={() => props.setData([])}>
+					<Button color="red" onClick={() => {
+						setSelectedPacket(null);
+						props.setData([]);
+					}}>
 						Clear
 					</Button>
 				</Group>
