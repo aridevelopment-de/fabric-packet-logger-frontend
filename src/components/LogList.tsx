@@ -1,5 +1,5 @@
 import { Code } from "@mantine/core";
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from 'react';
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import styles from "./loglist.module.css";
@@ -11,9 +11,25 @@ const LogList = (props: {
 	blacklist: Array<string>;
 	onSelect: Function;
 	selected: number | null;
+	autoScroll: boolean;
 }) => {
+	const ref = useRef<HTMLDivElement>();
+
+	useEffect(() => {
+		if (props.autoScroll && props.selected === null && ref.current) {
+			const element = ref.current;
+			// element.scrollTop = element.scrollHeight;
+			// smooth scrolling
+			element.scrollTo({
+				top: element.scrollHeight,
+				behavior: "smooth",
+			});
+		}
+	}, [props.autoScroll, props.selected, props.data.length]);
+
 	return (
-		<div className={styles.container}>
+		// @ts-ignore
+		<div className={styles.container} ref={ref}>
 			{props.data.map((item, index) => {
 				let returnable: JSX.Element | null = <LogLine
 					key={index}
@@ -48,7 +64,7 @@ const LogLine = (props: {
   onClick: Function;
 }) => {
   const stringifiedData = useMemo(() => JSON.stringify(props.data.data, null, 2), [props.data.data]);
-  
+
 	return (
 		<div className={styles.line} onClick={() => props.onClick()}>
 			<div className={styles.timestamp}>{new Date(props.timestamp).toLocaleTimeString()}</div>

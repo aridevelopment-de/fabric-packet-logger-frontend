@@ -33,3 +33,7 @@
 .packet_blacklist {
   margin-top: 2em !important;
 }
+
+.config > * {
+  margin-top: 0.5em;
+}

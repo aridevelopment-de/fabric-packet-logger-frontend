@@ -15,6 +15,7 @@ function App() {
 	const [allPackets, setAllPackets] = useState<Array<{ value: string; label: string }>>([]);
 	const [descriptionData, setDescriptionData] = useState<{ [key: string]: IDescription }>({});
 	const [selectedPacket, setSelectedPacket] = useState<number | null>(null);
+	const [autoScroll, setAutoScroll] = useState<boolean>(false);
 
 	useEffect(() => {
 		const port = new URLSearchParams(document.location.search).get("wssPort") || "1337";
@@ -70,10 +71,12 @@ function App() {
 				initialWhitelistData={allPackets}
 				whitelistData={whitelistData}
 				blacklistData={blacklistData}
+				autoScroll={autoScroll}
 				setWhitelistData={setWhitelistData}
 				setBlacklistData={setBlacklistData}
 				onReconnect={() => setConnectedUpdate(connectedUpdate + 1)}
 				onClear={() => setData([])}
+				onAutoScroll={(value) => setAutoScroll(value)}
 			/>
 			<div
 				style={{
@@ -88,6 +91,7 @@ function App() {
 					blacklist={blacklistData}
 					onSelect={setSelectedPacket}
 					selected={selectedPacket}
+					autoScroll={autoScroll}
 				/>
 				<Inspector
 					selectedPacket={selectedPacket !== null ? data.filter((p) => p.id === selectedPacket)[0] : null}

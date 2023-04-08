@@ -1,28 +1,33 @@
-import { Button, Divider, MultiSelect } from "@mantine/core";
+import { Button, Checkbox, Divider, MultiSelect } from "@mantine/core";
 import styles from "./sidebar.module.css";
 
 const Sidebar = (props: {
 	connected: boolean;
-	initialWhitelistData: Array<{value: string; label: string}>;
+	initialWhitelistData: Array<{ value: string; label: string }>;
 	whitelistData: Array<string>;
 	blacklistData: Array<string>;
+	autoScroll: boolean;
 	setWhitelistData: (value: Array<string>) => void;
 	setBlacklistData: (value: Array<string>) => void;
-  onReconnect: () => void;
+	onReconnect: () => void;
 	onClear: () => void;
+	onAutoScroll: (value: boolean) => void;
 }) => {
 	return (
 		<div className={styles.container}>
 			<div className={styles.ws_status}>
-				<span>Connected to mc:{" "}
+				<span>
+					Connected to mc:{" "}
 					<span style={{ color: props.connected ? "var(--color-green)" : "var(--color-red)" }}>
 						{String(props.connected)}
 					</span>
 				</span>
 			</div>
-      <div className={styles.action_group}>
+			<div className={styles.action_group}>
 				<Button onClick={props.onReconnect}>Reconnect</Button>
-				<Button color="red" onClick={props.onClear}>Clear</Button>
+				<Button color="red" onClick={props.onClear}>
+					Clear
+				</Button>
 			</div>
 			<Divider my="xl" />
 			<div className={styles.packet_whitelist}>
@@ -47,6 +52,18 @@ const Sidebar = (props: {
 					searchable
 					placeholder="Pick all packets that you don't want to see"
 					nothingFound="No packets found"
+				/>
+			</div>
+			<Divider my="xl" />
+			<div className={styles.config}>
+				<Checkbox
+					onChange={(e) => props.onAutoScroll(e.currentTarget.checked)}
+					checked={props.autoScroll}
+					label="Autoscroll"
+				/>
+				<Checkbox
+					label="Only save filtered packets"
+					checked={false}
 				/>
 			</div>
 		</div>
