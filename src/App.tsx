@@ -128,7 +128,10 @@ function App() {
 				setWhitelistData={setWhitelistData}
 				setBlacklistData={setBlacklistData}
 				onReconnect={() => setConnectedUpdate(connectedUpdate + 1)}
-				onClear={() => setData([])}
+				onClear={() => {
+					setSelectedPacket(null);
+					setData([]);
+				}}
 				onAutoScroll={(value) => setAutoScroll(value)}
 				onOnlySaveFiltered={(value) => setOnlySaveFiltered(value)}
 				onLoggingState={(value) => {
