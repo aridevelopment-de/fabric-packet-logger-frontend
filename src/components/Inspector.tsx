@@ -29,7 +29,9 @@ const Inspector = (props: { selectedPacket: IBasePacket | null, descriptions: {[
         <a className={styles.title} href={"https://wiki.vg/Protocol#" + props.selectedPacket.data.name}>
           {props.selectedPacket.data.name}
         </a>
-        <Text color="dimmed" className={styles.description}>{description.general}</Text>
+        {(description.general ?? "No description available. Be the first to add one!").split("\n").map((line, idx) =>
+          <Text color="dimmed" className={styles.description} key={idx}>{line}</Text>
+        )}
       </header>
       <main>
         <ul className={styles.meta}>
@@ -42,7 +44,9 @@ const Inspector = (props: { selectedPacket: IBasePacket | null, descriptions: {[
           <div className={styles.wikiVgEntry}>
             <span className={styles.wikiVgTitle}>wiki.vg description</span>
             <div className={styles.wikiVgContent}>
-              <Text style={{lineHeight: 1.2}}>{description.wikiVgNotes}</Text>
+              {description.wikiVgNotes.split("\n").map((line, idx) => 
+                <Text style={{lineHeight: 1.2}} key={idx}>{line}</Text>
+              )}
             </div>
           </div>
         )}
