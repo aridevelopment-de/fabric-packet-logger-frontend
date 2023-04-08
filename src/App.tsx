@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Inspector from "./components/Inspector";
 import LogList from "./components/LogList";
 import Sidebar from "./components/Sidebar";
@@ -7,6 +7,7 @@ import { IBasePacket, IDescription } from "./components/types";
 let globalId = 0;
 
 function App() {
+	const [ws, setWs] = useState<WebSocket | null>(null);
 	const [data, setData] = useState<Array<IBasePacket>>([]);
 	const [connected, setConnected] = useState(false);
 	const [connectedUpdate, setConnectedUpdate] = useState(0);
@@ -16,25 +17,13 @@ function App() {
 	const [descriptionData, setDescriptionData] = useState<{ [key: string]: IDescription }>({});
 	const [selectedPacket, setSelectedPacket] = useState<number | null>(null);
 	const [autoScroll, setAutoScroll] = useState<boolean>(false);
+	const [onlySaveFiltered, setOnlySaveFiltered] = useState<boolean>(false);
 
-	useEffect(() => {
-		const port = new URLSearchParams(document.location.search).get("wssPort") || "1337";
-		const ws = new WebSocket("ws://localhost:" + port);
+	const onMessage = useCallback((event: MessageEvent) => {
+		const data = JSON.parse(event.data);
 
-		ws.onopen = () => {
-			console.log("Connected to server");
-			setConnected(true);
-		};
-
-		ws.onmessage = (event) => {
-			const data = JSON.parse(event.data);
-
-			if (data.allPackets !== undefined) {
-				setAllPackets(data.allPackets);
-				setDescriptionData(data.descriptions);
-
-				console.log(data.allPackets);
-			} else {
+		if (data.allPackets === undefined) {
+			if (!onlySaveFiltered) {
 				setData((prevData) => {
 					return [
 						...prevData,
@@ -45,7 +34,47 @@ function App() {
 						},
 					];
 				});
+
+				return;
+			} else {
+				let shallAdd = true;
+
+				if (whitelistData.length > 0) {
+					if (!whitelistData.includes(data.id)) {
+						shallAdd = false;
+					}
+				}
+
+				if (blacklistData.length > 0) {
+					if (blacklistData.includes(data.id)) {
+						shallAdd = false;
+					}
+				}
+
+				if (shallAdd) {
+					setData((prevData) => {
+						return [
+							...prevData,
+							{
+								timestamp: Date.now(),
+								id: globalId++,
+								data: data,
+							},
+						];
+					});
+				}
 			}
+		}
+	}, [onlySaveFiltered, whitelistData, blacklistData]);
+
+	useEffect(() => {
+		const port = new URLSearchParams(document.location.search).get("wssPort") || "1337";
+		const ws = new WebSocket("ws://localhost:" + port);
+
+		ws.onopen = () => {
+			console.log("Connected to server");
+			setConnected(true);
+			setWs(ws);
 		};
 
 		ws.onclose = () => {
@@ -53,10 +82,30 @@ function App() {
 			setConnected(false);
 		};
 
+		ws.addEventListener("message", (event) => {
+			const data = JSON.parse(event.data);
+
+
+			if (data.allPackets !== undefined) {
+				setAllPackets(data.allPackets);
+				setDescriptionData(data.descriptions);
+	
+				console.log(data.allPackets);
+			}
+		})
+
 		return () => {
 			ws.close();
 		};
 	}, [connectedUpdate]);
+
+	useEffect(() => {
+		if (ws) {
+			ws.onmessage = (event) => {
+				onMessage(event);
+			};
+		}
+	}, [ws, onMessage]);
 
 	return (
 		<div
@@ -72,11 +121,13 @@ function App() {
 				whitelistData={whitelistData}
 				blacklistData={blacklistData}
 				autoScroll={autoScroll}
+				onlySaveFiltered={onlySaveFiltered}
 				setWhitelistData={setWhitelistData}
 				setBlacklistData={setBlacklistData}
 				onReconnect={() => setConnectedUpdate(connectedUpdate + 1)}
 				onClear={() => setData([])}
 				onAutoScroll={(value) => setAutoScroll(value)}
+				onOnlySaveFiltered={(value) => setOnlySaveFiltered(value)}
 			/>
 			<div
 				style={{

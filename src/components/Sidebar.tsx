@@ -7,11 +7,13 @@ const Sidebar = (props: {
 	whitelistData: Array<string>;
 	blacklistData: Array<string>;
 	autoScroll: boolean;
+	onlySaveFiltered: boolean;
 	setWhitelistData: (value: Array<string>) => void;
 	setBlacklistData: (value: Array<string>) => void;
 	onReconnect: () => void;
 	onClear: () => void;
 	onAutoScroll: (value: boolean) => void;
+	onOnlySaveFiltered: (value: boolean) => void;
 }) => {
 	return (
 		<div className={styles.container}>
@@ -62,8 +64,9 @@ const Sidebar = (props: {
 					label="Autoscroll"
 				/>
 				<Checkbox
+					onChange={(e) => props.onOnlySaveFiltered(e.currentTarget.checked)}
+					checked={props.onlySaveFiltered}
 					label="Only save filtered packets"
-					checked={false}
 				/>
 			</div>
 		</div>

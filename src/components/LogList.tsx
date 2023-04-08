@@ -16,6 +16,14 @@ const LogList = (props: {
 	const ref = useRef<HTMLDivElement>();
 
 	useEffect(() => {
+		// initial auto scroll
+		if (props.autoScroll && ref.current) {
+			const element = ref.current;
+			element.scrollTop = element.scrollHeight;
+		}
+	}, [props.autoScroll, props.whitelist.length, props.blacklist.length]);
+
+	useEffect(() => {
 		if (props.autoScroll && props.selected === null && ref.current) {
 			const element = ref.current;
 			// element.scrollTop = element.scrollHeight;
