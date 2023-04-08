@@ -1,30 +1,32 @@
 import { Code } from "@mantine/core";
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import styles from "./loglist.module.css";
 import { IBasePacket } from "./types";
+import { useSession, useSettings } from "./hooks/useSettings";
 
-const LogList = (props: {
-	data: Array<IBasePacket>;
-	whitelist: Array<string>;
-	blacklist: Array<string>;
-	onSelect: Function;
-	selected: number | null;
-	autoScroll: boolean;
-}) => {
+const LogList = (props: {data: IBasePacket[]}) => {
+	const [selectedPacket, setSelectedPacket] = useSession((state) => [
+		state.selectedPacket, state.setSelectedPacket
+	])
+	const [autoScroll, whitelist, blacklist] = useSettings((state) => [
+		state.autoScroll,
+		state.whitelistedPackets,
+		state.blacklistedPackets,
+	]);
 	const ref = useRef<HTMLDivElement>();
 
 	useEffect(() => {
 		// initial auto scroll
-		if (props.autoScroll && ref.current) {
+		if (autoScroll && ref.current) {
 			const element = ref.current;
 			element.scrollTop = element.scrollHeight;
 		}
-	}, [props.autoScroll, props.whitelist.length, props.blacklist.length]);
+	}, [autoScroll, whitelist.length, blacklist.length]);
 
 	useEffect(() => {
-		if (props.autoScroll && props.selected === null && ref.current) {
+		if (autoScroll && selectedPacket === null && ref.current) {
 			const element = ref.current;
 			// element.scrollTop = element.scrollHeight;
 			// smooth scrolling
@@ -33,28 +35,30 @@ const LogList = (props: {
 				behavior: "smooth",
 			});
 		}
-	}, [props.autoScroll, props.selected, props.data.length]);
+	}, [autoScroll, selectedPacket, props.data.length]);
 
 	return (
 		// @ts-ignore
 		<div className={styles.container} ref={ref}>
 			{props.data.map((item, index) => {
-				let returnable: JSX.Element | null = <LogLine
-					key={index}
-					timestamp={item.timestamp}
-					data={item.data}
-					selected={item.id === props.selected}
-					onClick={() => props.onSelect(item.id === props.selected ? null : item.id)}
-				/>;
+				let returnable: JSX.Element | null = (
+					<LogLine
+						key={index}
+						timestamp={item.timestamp}
+						data={item.data}
+						selected={item.id === selectedPacket}
+						onClick={() => setSelectedPacket(item.id === selectedPacket ? null : item.id)}
+					/>
+				);
 
-				if (props.whitelist.length > 0) {
-					if (!props.whitelist.includes(item.data.id)) {
+				if (whitelist.length > 0) {
+					if (!whitelist.includes(item.data.id)) {
 						returnable = null;
 					}
 				}
 
-				if (props.blacklist.length > 0) {
-					if (props.blacklist.includes(item.data.id)) {
+				if (blacklist.length > 0) {
+					if (blacklist.includes(item.data.id)) {
 						returnable = null;
 					}
 				}
@@ -66,29 +70,30 @@ const LogList = (props: {
 };
 
 const LogLine = (props: {
-  timestamp: IBasePacket["timestamp"];
-  data: IBasePacket["data"];
-  selected: boolean;
-  onClick: Function;
+	timestamp: IBasePacket["timestamp"];
+	data: IBasePacket["data"];
+	selected: boolean;
+	onClick: Function;
 }) => {
-  const stringifiedData = useMemo(() => JSON.stringify(props.data.data, null, 2), [props.data.data]);
+	const stringifiedData = useMemo(() => JSON.stringify(props.data.data, null, 2), [props.data.data]);
 
 	return (
 		<div className={styles.line} onClick={() => props.onClick()}>
 			<div className={styles.timestamp}>{new Date(props.timestamp).toLocaleTimeString()}</div>
 			<div className={styles.packet_name}>
-				{props.data.name} <span className={styles.legacy_packet_name}>({props.data.legacyName + "S2CPacket"})</span>
+				{props.data.name}{" "}
+				<span className={styles.legacy_packet_name}>({props.data.legacyName + "S2CPacket"})</span>
 			</div>
 
 			{props.selected && (
 				<div className={styles.expanded}>
-          {stringifiedData.length < 1000 ? (
-            <SyntaxHighlighter language="json" style={atomOneDark}>
-              {stringifiedData}
-            </SyntaxHighlighter>
-          ) : (
-            <Code block>{stringifiedData}</Code>
-          )}
+					{stringifiedData.length < 1000 ? (
+						<SyntaxHighlighter language="json" style={atomOneDark}>
+							{stringifiedData}
+						</SyntaxHighlighter>
+					) : (
+						<Code block>{stringifiedData}</Code>
+					)}
 				</div>
 			)}
 		</div>

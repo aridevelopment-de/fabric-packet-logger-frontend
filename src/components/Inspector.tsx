@@ -1,6 +1,7 @@
 import { Code, Table, Text } from "@mantine/core";
 import React from "react";
 import { ADAPTERS } from "./adapters/adapters";
+import { useSession } from "./hooks/useSettings";
 import styles from "./inspector.module.css";
 import { IBasePacket, IDescription } from "./types";
 
@@ -16,18 +17,24 @@ const COLORS = {
   function: "rgb(200, 200, 200)",
 }
 
-const Inspector = (props: { selectedPacket: IBasePacket | null, descriptions: {[key: string]: IDescription} }) => {
-	if (props.selectedPacket === null) return null;
+const Inspector = (props: {data: IBasePacket[]}) => {
+	const [selectedPacketId, packetDescriptions] = useSession((state) => [
+    state.selectedPacket,
+    state.packetDescriptions,
+  ])
 
+  if (selectedPacketId === null) return null;
+
+  const selectedPacket = props.data[selectedPacketId];
   // @ts-ignore
-  const adapter: any = ADAPTERS[props.selectedPacket.data.id];
-  const description: IDescription = props.descriptions[props.selectedPacket.data.id];
+  const adapter: any = ADAPTERS[selectedPacket.data.id];
+  const description: IDescription = packetDescriptions[selectedPacket.data.id];
 
 	return (
 		<div className={styles.container}>
       <header className={styles.header}>
-        <a className={styles.title} href={"https://wiki.vg/Protocol#" + props.selectedPacket.data.name}>
-          {props.selectedPacket.data.name}
+        <a className={styles.title} href={"https://wiki.vg/Protocol#" + selectedPacket.data.name}>
+          {selectedPacket.data.name}
         </a>
         {(description.general ?? "No description available. Be the first to add one!").split("\n").map((line, idx) =>
           <Text color="dimmed" className={styles.description} key={idx}>{line}</Text>
@@ -35,9 +42,9 @@ const Inspector = (props: { selectedPacket: IBasePacket | null, descriptions: {[
       </header>
       <main>
         <ul className={styles.meta}>
-          <li><b>Packet Id:</b> {props.selectedPacket.data.id.split("-")[1]}</li>
-          <li><b>Packet category:</b> {props.selectedPacket.data.id.split("-")[0]}</li>
-          <li><b>Internal name:</b> {props.selectedPacket.data.legacyName}</li>
+          <li><b>Packet Id:</b> {selectedPacket.data.id.split("-")[1]}</li>
+          <li><b>Packet category:</b> {selectedPacket.data.id.split("-")[0]}</li>
+          <li><b>Internal name:</b> {selectedPacket.data.legacyName}</li>
           <li><b>Direction:</b> Server -&gt; Client</li>
         </ul>
         {description.wikiVgNotes !== undefined && (
@@ -60,14 +67,14 @@ const Inspector = (props: { selectedPacket: IBasePacket | null, descriptions: {[
               </tr>
             </thead>
             <tbody>
-              {Object.keys(props.selectedPacket.data.data).map((key, index) => {
-                let value = props.selectedPacket!.data.data[key];
+              {Object.keys(selectedPacket.data.data).map((key, index) => {
+                let value = selectedPacket!.data.data[key];
                 
                 if (typeof value === "object") {
                   value = "Object"
                 }
 
-                const color = COLORS[typeof props.selectedPacket!.data.data[key]];
+                const color = COLORS[typeof selectedPacket!.data.data[key]];
                 value = JSON.stringify(value);
                 
                 return (
@@ -86,7 +93,7 @@ const Inspector = (props: { selectedPacket: IBasePacket | null, descriptions: {[
           <div className={styles.extra}>
             <span className={styles.extraTitle}>Extra</span>
             <div className={styles.extraContent}>
-              {React.cloneElement(adapter, {data: props.selectedPacket.data.data})}
+              {React.cloneElement(adapter, {data: selectedPacket.data.data})}
             </div>
           </div>
         )}

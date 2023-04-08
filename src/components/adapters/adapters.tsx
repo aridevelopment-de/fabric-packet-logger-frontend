@@ -13,5 +13,5 @@ export const EMPTY_PACKET: IBasePacket = {
 }
 
 export const ADAPTERS = {
-  "0x29": <MapUpdateS2CAdapter data={EMPTY_PACKET} />,
+  "PLAY-0x29": <MapUpdateS2CAdapter data={EMPTY_PACKET} />,
 }
