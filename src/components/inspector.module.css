@@ -1,11 +1,11 @@
 .container {
-  width: fit-content;
   height: calc(100vh - 4em);
   background-color: var(--darkened-background-color);
-  box-shadow: 0 0 -10px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   padding: 2em;
   width: 30vw;
   font-family: Segoe UI, sans-serif;
+  overflow-y: auto;
 }
 
 .header {
@@ -67,6 +67,10 @@
   border-radius: 13px;
   border-top-left-radius: 0;
   padding: 1em;
+}
+
+.fields {
+  width: 100%;
 }
 
 .extra {
