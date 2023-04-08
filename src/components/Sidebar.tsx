@@ -1,35 +1,52 @@
-import { Button, TransferList } from "@mantine/core";
-import { TransferListData } from "@mantine/core/lib/TransferList/types";
+import { Button, Divider, MultiSelect } from "@mantine/core";
 import styles from "./sidebar.module.css";
 
 const Sidebar = (props: {
 	connected: boolean;
-	transferListData: TransferListData;
-	setTransferListData: (value: TransferListData) => void;
+	initialWhitelistData: Array<{value: string; label: string}>;
+	whitelistData: Array<string>;
+	blacklistData: Array<string>;
+	setWhitelistData: (value: Array<string>) => void;
+	setBlacklistData: (value: Array<string>) => void;
   onReconnect: () => void;
+	onClear: () => void;
 }) => {
 	return (
 		<div className={styles.container}>
-			<span>
-				Connected to mc:{" "}
-				<span style={{ color: props.connected ? "var(--color-green)" : "var(--color-red)" }}>
-					{String(props.connected)}
+			<div className={styles.ws_status}>
+				<span>Connected to mc:{" "}
+					<span style={{ color: props.connected ? "var(--color-green)" : "var(--color-red)" }}>
+						{String(props.connected)}
+					</span>
 				</span>
-        <Button onClick={props.onReconnect} style={{marginTop: "1em"}}>Reconnect</Button>
-			</span>
-			<span className={styles.title}>Packet-Filter</span>
-			<div className={styles.filters}>
-				<TransferList
-					value={props.transferListData}
-					onChange={props.setTransferListData}
-					searchPlaceholder="Search for packet name..."
+			</div>
+      <div className={styles.action_group}>
+				<Button onClick={props.onReconnect}>Reconnect</Button>
+				<Button color="red" onClick={props.onClear}>Clear</Button>
+			</div>
+			<Divider my="xl" />
+			<div className={styles.packet_whitelist}>
+				<span className={styles.title}>Packet whitelist</span>
+				<MultiSelect
+					data={props.initialWhitelistData}
+					value={props.whitelistData}
+					onChange={props.setWhitelistData}
+					clearable
+					searchable
+					placeholder="Pick all packets that you want to see"
 					nothingFound="No packets found"
-					titles={["Available", "Whitelist"]}
-					breakpoint="sm"
-					style={{
-						gridTemplateColumns: "300px",
-						gridTemplateRows: "1fr 1fr",
-					}}
+				/>
+			</div>
+			<div className={styles.packet_blacklist}>
+				<span className={styles.title}>Packet Blacklist</span>
+				<MultiSelect
+					data={props.initialWhitelistData}
+					value={props.blacklistData}
+					onChange={props.setBlacklistData}
+					clearable
+					searchable
+					placeholder="Pick all packets that you don't want to see"
+					nothingFound="No packets found"
 				/>
 			</div>
 		</div>

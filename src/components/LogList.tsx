@@ -1,5 +1,4 @@
 import { Code } from "@mantine/core";
-import { TransferListData } from "@mantine/core/lib/TransferList/types";
 import { useMemo } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
@@ -8,36 +7,35 @@ import { IBasePacket } from "./types";
 
 const LogList = (props: {
 	data: Array<IBasePacket>;
-	filters: TransferListData;
+	whitelist: Array<string>;
+	blacklist: Array<string>;
 	onSelect: Function;
 	selected: number | null;
 }) => {
 	return (
 		<div className={styles.container}>
 			{props.data.map((item, index) => {
-				if (props.filters[1].length > 0) {
-					if (props.filters[1].map((item) => item.value).includes(item.data.legacyName + "S2CPacket")) {
-						return <LogLine
-              key={index}
-              timestamp={item.timestamp}
-              data={item.data}
-              selected={item.id === props.selected}
-              onClick={() => props.onSelect(item.id === props.selected ? null : item.id)}
-            />
-					}
+				let returnable: JSX.Element | null = <LogLine
+					key={index}
+					timestamp={item.timestamp}
+					data={item.data}
+					selected={item.id === props.selected}
+					onClick={() => props.onSelect(item.id === props.selected ? null : item.id)}
+				/>;
 
-					return null;
+				if (props.whitelist.length > 0) {
+					if (!props.whitelist.includes(item.data.id)) {
+						returnable = null;
+					}
 				}
 
-				return (
-					<LogLine
-						key={index}
-						timestamp={item.timestamp}
-						data={item.data}
-						selected={item.id === props.selected}
-						onClick={() => props.onSelect(item.id === props.selected ? null : item.id)}
-					/>
-				);
+				if (props.blacklist.length > 0) {
+					if (props.blacklist.includes(item.data.id)) {
+						returnable = null;
+					}
+				}
+
+				return returnable;
 			})}
 		</div>
 	);

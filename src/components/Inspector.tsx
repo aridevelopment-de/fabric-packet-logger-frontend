@@ -21,7 +21,7 @@ const Inspector = (props: { selectedPacket: IBasePacket | null, descriptions: {[
 
   // @ts-ignore
   const adapter: any = ADAPTERS[props.selectedPacket.data.id];
-  const description: IDescription = props.descriptions[props.selectedPacket.data.name];
+  const description: IDescription = props.descriptions[props.selectedPacket.data.id];
 
 	return (
 		<div className={styles.container}>
@@ -33,7 +33,8 @@ const Inspector = (props: { selectedPacket: IBasePacket | null, descriptions: {[
       </header>
       <main>
         <ul className={styles.meta}>
-          <li><b>Packet Id:</b> {props.selectedPacket.data.id}</li>
+          <li><b>Packet Id:</b> {props.selectedPacket.data.id.split("-")[1]}</li>
+          <li><b>Packet category:</b> {props.selectedPacket.data.id.split("-")[0]}</li>
           <li><b>Internal name:</b> {props.selectedPacket.data.legacyName}</li>
           <li><b>Direction:</b> Server -&gt; Client</li>
         </ul>

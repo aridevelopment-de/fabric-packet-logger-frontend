@@ -5,15 +5,31 @@
   bottom: 0;
   width: fit-content; 
   height: calc(100vh - 4em);
+  width: 30vw;
   background-color: var(--darkened-background-color);
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   padding: 2em;
+}
+
+.container > *:not(:first-child) {
+  margin-top: 1em;
+}
+
+
+.action_group {
   display: flex;
-  flex-direction: column;
-  gap: 2em;
+  gap: 1em;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .title {
-  font-size: 1.5em;
-  font-weight: 600;
+  display: block;
+  font-size: 1.4em;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.packet_blacklist {
+  margin-top: 2em !important;
 }
