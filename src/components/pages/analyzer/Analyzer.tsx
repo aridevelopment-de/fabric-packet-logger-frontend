@@ -44,17 +44,17 @@ const Analyzer = () => {
 };
 
 const Meta = () => {
-	const [hasLog, mapping, logTitle, setHasLog, setData, setMapping, setLogTitle] = useAnalyzerData((state) => [
-		state.hasLog,
+	const [minimized, hasLog, mapping, logTitle, setMinimized, setHasLog, setData, setMapping, setLogTitle] = useAnalyzerData((state) => [
+		state.metaMinimized,
+    state.hasLog,
 		state.mapping,
 		state.logTitle,
+    state.setMetaMinimized,
 		state.setHasLog,
 		state.setData,
 		state.setMapping,
 		state.setLogTitle,
 	]);
-  const [minimized, setMinimized] = useState<boolean>(false);
-
 	return (
 		<div className={`${styles.meta} ${minimized ? styles.minimized : ""} ${hasLog ? styles.has_log : ""}`}>
       {minimized ? (
