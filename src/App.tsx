@@ -4,6 +4,7 @@ import LogList from "./components/LogList";
 import Sidebar from "./components/Sidebar";
 import { SettingsState, useSession, useSettings } from "./components/hooks/useSettings";
 import { IBasePacket } from "./components/types";
+import { downloadContent } from "./utils/browserutils";
 
 let globalId = 0;
 
@@ -116,7 +117,13 @@ function App() {
 				width: "100%",
 			}}
 		>
-			<Sidebar setData={setData} onReconnect={() => setConnectedUpdate(connectedUpdate + 1)} />
+			<Sidebar setData={setData} onReconnect={() => setConnectedUpdate(connectedUpdate + 1)} onDownload={() => {
+					const date = new Date();
+					downloadContent(
+						`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}-packet-dump.json`,
+					 	JSON.stringify(data, null)
+					);
+				}} />
 			<div
 				style={{
 					display: "flex",

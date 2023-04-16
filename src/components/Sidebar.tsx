@@ -1,9 +1,10 @@
 import { Button, Checkbox, Divider, Group, MultiSelect, SegmentedControl } from "@mantine/core";
+import { FileExport } from "tabler-icons-react";
 import { useSession, useSettings } from "./hooks/useSettings";
 import styles from "./sidebar.module.css";
 import { IBasePacket } from "./types";
 
-const Sidebar = (props: { onReconnect: () => void, setData: (newData: IBasePacket[]) => void }) => {
+const Sidebar = (props: { onReconnect: () => void, setData: (newData: IBasePacket[]) => void, onDownload: () => void }) => {
 	const [
 		whitelist,
 		blacklist,
@@ -96,6 +97,7 @@ const Sidebar = (props: { onReconnect: () => void, setData: (newData: IBasePacke
 			</div>
 			<Divider my="xl" />
 			<div className={styles.config}>
+				<Button color="orange" leftIcon={<FileExport />} onClick={props.onDownload}>Export</Button>
 				<Checkbox
 					onChange={(e) => setAutoScroll(e.currentTarget.checked)}
 					checked={autoScroll}
