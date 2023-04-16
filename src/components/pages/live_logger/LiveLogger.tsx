@@ -1,12 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
-import { downloadContent } from "../../../utils/browserutils";
+import { useCallback, useEffect } from "react";
+import { downloadContentBig } from "../../../utils/browserutils";
+import EventHandler, { EventType } from "../../../utils/eventhandler";
 import { useSession } from "../../hooks/useSettings";
 import { IBasePacket } from "../../types";
 import Inspector from "./Inspector";
 import LogList from "./LogList";
 import Sidebar from "./Sidebar";
-import EventHandler from "../../../utils/eventhandler";
-import { EventType } from "../../../utils/eventhandler";
 
 function LiveLogger(props: { data: IBasePacket[] }) {
 	// Way around for react-query not updating the state
@@ -45,7 +44,7 @@ function LiveLogger(props: { data: IBasePacket[] }) {
 				onReconnect={() => ws ? ws.reconnect() : void 0}
 				onDownload={() => {
 					const date = new Date();
-					downloadContent(
+					downloadContentBig(
 						`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}-packet-dump.json`,
 						JSON.stringify(props.data, null)
 					);

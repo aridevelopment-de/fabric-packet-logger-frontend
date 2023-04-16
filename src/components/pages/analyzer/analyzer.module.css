@@ -2,6 +2,7 @@
   position: relative;
   flex: 1 1 auto;
 	overflow: hidden;
+  display: flex;
 }
 
 .meta {
@@ -21,6 +22,19 @@
   /* right property doesn't seem to work, that's why the workaround */
   left: calc(100% - 1em);
   translate: -100% 0;
+}
+
+.meta.minimized {
+  width: fit-content;
+  border-radius: 0;
+  border-top-left-radius: 50%;
+  border-top-right-radius: 50%;
+  box-shadow: none;
+  padding: 1em;
+  top: unset;
+  bottom: 0;
+  left: 3em;
+  translate: 0 0;
 }
 
 .meta > * {
