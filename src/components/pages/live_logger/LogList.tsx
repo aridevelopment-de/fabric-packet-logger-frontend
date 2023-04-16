@@ -69,7 +69,7 @@ const LogList = (props: {data: IBasePacket[]}) => {
 	);
 };
 
-const LogLine = (props: {
+export const LogLine = (props: {
 	timestamp: IBasePacket["timestamp"];
 	data: IBasePacket["data"];
 	selected: boolean;

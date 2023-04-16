@@ -37,3 +37,16 @@ body {
 code {
   font-family: "JetBrains Mono", monospace;
 }
+
+input {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid white;
+  padding: 10px 5px;
+  font-size: 1.125em;
+  color: var(--text-color);
+}
+
+input:focus {
+  outline: none;
+}

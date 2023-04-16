@@ -1,0 +1,44 @@
+.container {
+  position: relative;
+  flex: 1 1 auto;
+	overflow: hidden;
+}
+
+.meta {
+  position: absolute;
+  top: 50%;
+  width: 20em;
+  left: 50%;
+  translate: -50% -50%;
+  background-color: var(--darkened-background-color);
+  padding: 2em;
+  border-radius: 13px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.meta.has_log {
+  top: 1em;
+  /* right property doesn't seem to work, that's why the workaround */
+  left: calc(100% - 1em);
+  translate: -100% 0;
+}
+
+.meta > * {
+  width: 100%;
+}
+
+.meta > *:not(:first-child) {
+  margin-top: 1.5em;
+}
+
+.content {
+  flex: 1 1 auto;
+  display: flex;
+  overflow: hidden;
+}
+
+.loglist {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  width: fit-content;
+}
