@@ -10,7 +10,7 @@ import { EventType } from "../../../utils/eventhandler";
 
 function LiveLogger(props: { data: IBasePacket[] }) {
 	// Way around for react-query not updating the state
-	const [ws, setLogState] = useSession((state) => [state.ws, state.setLogState]);
+	const [ws, selectedPacketId, setLogState] = useSession((state) => [state.ws, state.selectedPacket, state.setLogState]);
 
 	const onMessage = useCallback(
 		(event: MessageEvent) => {
@@ -52,7 +52,7 @@ function LiveLogger(props: { data: IBasePacket[] }) {
 				}}
 			/>
 			<LogList data={props.data} />
-			<Inspector data={props.data} />
+			<Inspector data={props.data} selectedPacketId={selectedPacketId} />
 		</div>
 	);
 }

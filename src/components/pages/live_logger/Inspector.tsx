@@ -17,15 +17,14 @@ const COLORS = {
   function: "rgb(200, 200, 200)",
 }
 
-const Inspector = (props: {data: IBasePacket[]}) => {
-	const [selectedPacketId, packetDescriptions] = useSession((state) => [
-    state.selectedPacket,
+const Inspector = (props: {data: IBasePacket[], selectedPacketId: number | null}) => {
+	const [packetDescriptions] = useSession((state) => [
     state.packetDescriptions,
   ])
 
-  if (selectedPacketId === null) return null;
+  if (props.selectedPacketId === null) return null;
 
-  const selectedPacket = props.data[selectedPacketId];
+  const selectedPacket = props.data[props.selectedPacketId];
 
   // To prevent racing conditions
   if (selectedPacket === undefined) return null;
