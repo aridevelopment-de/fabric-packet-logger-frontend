@@ -1,5 +1,4 @@
 export interface IBasePacket {
-	id: number;
 	timestamp: number;
 	data: {
 		name: string;

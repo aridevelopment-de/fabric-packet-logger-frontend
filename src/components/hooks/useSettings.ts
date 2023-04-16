@@ -1,6 +1,18 @@
 import { create } from "zustand";
-import { persist, createJSONStorage, devtools } from "zustand/middleware";
-import { IBasePacket, IDescription } from "../types";
+import { createJSONStorage, devtools, persist } from "zustand/middleware";
+import { IDescription } from "../types";
+import ReconnectingWebSocket from "reconnecting-websocket";
+
+// TODO: Use react router dom
+export enum CurrentPage {
+  LIVE_LOGGER = "Live Logger",
+  ANALYZER = "Analyzer",
+  INTERCEPTOR = "Interceptor",
+  SEQUENCER = "Sequencer",
+  COMPARER = "Comparer",
+  PACKET_LIST = "Packet List",
+  SETTINGS = "Settings",
+}
 
 export interface SettingsState {
   whitelistedPackets: string[];
@@ -16,19 +28,21 @@ export interface SettingsState {
 
 export interface SessionState {
   logState: "logging" | "off";
-  ws: WebSocket | null;
+  ws: ReconnectingWebSocket | null;
   connected: boolean;
   // TODO: Make selectedPacket IBasePacket
   selectedPacket: number | null;
   registeredPackets: Array<{value: string; label: string}>;
   packetDescriptions: {[key: string]: IDescription};
+  page: CurrentPage;
 
   setLogState: (logState: "logging" | "off") => void;
-  setWs: (ws: WebSocket | null) => void;
+  setWs: (ws: ReconnectingWebSocket | null) => void;
   setConnected: (connected: boolean) => void;
   setSelectedPacket: (selectedPacket: number | null) => void;
   setRegisteredPackets: (registeredPackets: Array<{value: string; label: string}>) => void;
   setPacketDescriptions: (packetDescriptions: {[key: string]: IDescription}) => void;
+  setPage: (page: CurrentPage) => void;
 }
 
 export const useSettings = create<SettingsState>()(
@@ -61,12 +75,14 @@ export const useSession = create<SessionState>()(
       selectedPacket: null,
       registeredPackets: [],
       packetDescriptions: {},
+      page: CurrentPage.LIVE_LOGGER,
       setLogState: (logState) => set({ logState }),
       setWs: (ws) => set({ ws }),
       setConnected: (connected) => set({ connected }),
       setSelectedPacket: (selectedPacket) => set({ selectedPacket }),
       setRegisteredPackets: (registeredPackets) => set({ registeredPackets }),
       setPacketDescriptions: (packetDescriptions) => set({ packetDescriptions }),
+      setPage: (page) => set({ page }),
     })
   )
 )

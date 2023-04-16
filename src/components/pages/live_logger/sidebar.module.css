@@ -1,13 +1,8 @@
 .container {
-  position: sticky;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: fit-content; 
-  height: calc(100vh - 4em);
-  width: 30vw;
+  flex: 0 0 auto;
+  overflow-y: auto;
+  width: fit-content;
   background-color: var(--darkened-background-color);
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   padding: 2em;
 }
 

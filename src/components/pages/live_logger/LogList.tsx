@@ -3,8 +3,8 @@ import { useMemo, useEffect, useRef } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import styles from "./loglist.module.css";
-import { IBasePacket } from "./types";
-import { useSession, useSettings } from "./hooks/useSettings";
+import { IBasePacket } from "../../types";
+import { useSession, useSettings } from "../../hooks/useSettings";
 
 const LogList = (props: {data: IBasePacket[]}) => {
 	const [selectedPacket, setSelectedPacket] = useSession((state) => [
@@ -46,8 +46,8 @@ const LogList = (props: {data: IBasePacket[]}) => {
 						key={index}
 						timestamp={item.timestamp}
 						data={item.data}
-						selected={item.id === selectedPacket}
-						onClick={() => setSelectedPacket(item.id === selectedPacket ? null : item.id)}
+						selected={index === selectedPacket}
+						onClick={() => setSelectedPacket(index === selectedPacket ? null : index)}
 					/>
 				);
 

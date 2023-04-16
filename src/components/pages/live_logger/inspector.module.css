@@ -1,11 +1,10 @@
 .container {
-  height: calc(100vh - 4em);
+  flex: 0 0 auto;
+  overflow-y: auto;
   background-color: var(--darkened-background-color);
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   padding: 2em;
   width: 30vw;
   font-family: Segoe UI, sans-serif;
-  overflow-y: auto;
 }
 
 .header {

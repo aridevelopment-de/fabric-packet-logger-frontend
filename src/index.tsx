@@ -1,11 +1,11 @@
+import { MantineProvider } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
+import { Notifications } from '@mantine/notifications';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import CustomRouter from './CustomRouter';
 import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { MantineProvider } from '@mantine/core';
-import { Notifications } from '@mantine/notifications';
-import { ModalsProvider } from '@mantine/modals';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -15,7 +15,7 @@ root.render(
     <MantineProvider withNormalizeCSS theme={{ colorScheme: "dark" }}>
       <Notifications />
       <ModalsProvider>
-        <App />
+        <CustomRouter />
       </ModalsProvider>
     </MantineProvider>
   </React.StrictMode>

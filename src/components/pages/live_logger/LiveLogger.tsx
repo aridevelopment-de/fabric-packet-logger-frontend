@@ -1,0 +1,60 @@
+import { useCallback, useEffect, useState } from "react";
+import { downloadContent } from "../../../utils/browserutils";
+import { useSession } from "../../hooks/useSettings";
+import { IBasePacket } from "../../types";
+import Inspector from "./Inspector";
+import LogList from "./LogList";
+import Sidebar from "./Sidebar";
+import EventHandler from "../../../utils/eventhandler";
+import { EventType } from "../../../utils/eventhandler";
+
+function LiveLogger(props: { data: IBasePacket[] }) {
+	// Way around for react-query not updating the state
+	const [ws, setLogState] = useSession((state) => [state.ws, state.setLogState]);
+
+	const onMessage = useCallback(
+		(event: MessageEvent) => {
+			const packetData = JSON.parse(event.data);
+
+			if (packetData.type === "loggingState") {
+				setLogState(packetData.state);
+			}
+		},
+		[setLogState]
+	);
+
+	useEffect(() => {
+		if (ws) {
+			ws.addEventListener("message", onMessage);
+			return () => {
+				ws.removeEventListener("message", onMessage);
+			};
+		}
+	}, [ws, onMessage]);
+
+	return (
+		<div
+			style={{
+				flex: "1 1 auto",
+				display: "flex",
+				overflow: "hidden",
+			}}
+		>
+			<Sidebar
+				setData={() => EventHandler.emit(EventType.DATA_CLEAR)}
+				onReconnect={() => ws ? ws.reconnect() : void 0}
+				onDownload={() => {
+					const date = new Date();
+					downloadContent(
+						`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}-packet-dump.json`,
+						JSON.stringify(props.data, null)
+					);
+				}}
+			/>
+			<LogList data={props.data} />
+			<Inspector data={props.data} />
+		</div>
+	);
+}
+
+export default LiveLogger;

@@ -1,0 +1,32 @@
+.nav {
+  flex: 0 0 auto;
+  overflow: auto;
+  display: flex;
+  background-color: var(--darkened-background-color);
+  border-bottom: 1px solid var(--text-color);
+  box-sizing: border-box;
+}
+
+.entry:nth-last-child(2) {
+  margin-left: auto;
+}
+
+.entry {
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.entry > span {
+  padding: 1em;
+}
+
+.entry:hover {
+  background-color: var(--lightened-background-color);
+}
+
+.selected {
+  background-color: var(--lightened-background-color);
+  border-bottom: 2px solid var(--color-orange);
+}

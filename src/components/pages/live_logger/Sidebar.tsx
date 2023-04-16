@@ -1,8 +1,8 @@
 import { Button, Checkbox, Divider, Group, MultiSelect, SegmentedControl } from "@mantine/core";
 import { FileExport } from "tabler-icons-react";
-import { useSession, useSettings } from "./hooks/useSettings";
+import { useSession, useSettings } from "../../hooks/useSettings";
 import styles from "./sidebar.module.css";
-import { IBasePacket } from "./types";
+import { IBasePacket } from "../../types";
 
 const Sidebar = (props: { onReconnect: () => void, setData: (newData: IBasePacket[]) => void, onDownload: () => void }) => {
 	const [

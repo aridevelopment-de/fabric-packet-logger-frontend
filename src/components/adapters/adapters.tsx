@@ -2,7 +2,6 @@ import { IBasePacket } from "../types";
 import MapUpdateS2CAdapter from "./MapUpdateS2C";
 
 export const EMPTY_PACKET: IBasePacket = {
-  id: -1,
 	timestamp: -1,
 	data: {
 		name: "-1",

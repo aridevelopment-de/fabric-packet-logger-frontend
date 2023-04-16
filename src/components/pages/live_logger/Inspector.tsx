@@ -1,9 +1,9 @@
 import { Code, Table, Text } from "@mantine/core";
 import React from "react";
-import { ADAPTERS } from "./adapters/adapters";
-import { useSession } from "./hooks/useSettings";
+import { ADAPTERS } from "../../adapters/adapters";
+import { useSession } from "../../hooks/useSettings";
 import styles from "./inspector.module.css";
-import { IBasePacket, IDescription } from "./types";
+import { IBasePacket, IDescription } from "../../types";
 
 const COLORS = {
   key: "rgb(209, 154, 102)",
