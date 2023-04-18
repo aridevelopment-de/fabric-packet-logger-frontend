@@ -1,15 +1,17 @@
-import { ActionIcon, Button, FileButton, Flex, Group, Select } from "@mantine/core";
-import styles from "./analyzer.module.css";
-import { useAnalyzerData } from "./useAnalyzerData";
-import { LogLine } from "../live_logger/LogList";
-import { useState } from "react";
+import { ActionIcon, Button, FileButton, Flex, Select } from "@mantine/core";
 import { Minimize, WindowMaximize } from "tabler-icons-react";
 import Inspector from "../live_logger/Inspector";
+import { LogLine } from "../live_logger/LogList";
+import styles from "./analyzer.module.css";
+import { useAnalyzerData } from "./useAnalyzerData";
+import { IBasePacket } from "../../types";
+
+/* Never ever use states for this, as states cause a big performance impact :( */
+let data: IBasePacket[] = [];
 
 const Analyzer = () => {
-	const [hasLog, data, selectedPacket, setSelectedPacket] = useAnalyzerData((state) => [
+	const [hasLog, selectedPacket, setSelectedPacket] = useAnalyzerData((state) => [
 		state.hasLog,
-		state.data,
 		state.selectedPacket,
 		state.setSelectedPacket,
 	]);
@@ -44,14 +46,13 @@ const Analyzer = () => {
 };
 
 const Meta = () => {
-	const [minimized, hasLog, mapping, logTitle, setMinimized, setHasLog, setData, setMapping, setLogTitle] = useAnalyzerData((state) => [
+	const [minimized, hasLog, mapping, logTitle, setMinimized, setHasLog, setMapping, setLogTitle] = useAnalyzerData((state) => [
 		state.metaMinimized,
     state.hasLog,
 		state.mapping,
 		state.logTitle,
     state.setMetaMinimized,
 		state.setHasLog,
-		state.setData,
 		state.setMapping,
 		state.setLogTitle,
 	]);
@@ -92,8 +93,8 @@ const Meta = () => {
                     return;
                   }
 
-                  const data = JSON.parse(e.target.result as string);
-                  setData(data);
+                  const d = JSON.parse(e.target.result as string);
+                  data = d;
                   setHasLog(true);
                   setLogTitle(file.name);
                 };
