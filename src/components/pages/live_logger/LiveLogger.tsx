@@ -2,24 +2,36 @@ import { useCallback, useEffect } from "react";
 import { downloadContentBig } from "../../../utils/browserutils";
 import EventHandler, { EventType } from "../../../utils/eventhandler";
 import { useSession } from "../../hooks/useSettings";
-import { IBasePacket } from "../../types";
+import { IRawPacket, IWSSPacket, PacketId } from "../../types";
 import Inspector from "./Inspector";
 import LogList from "./LogList";
 import Sidebar from "./Sidebar";
+import { useState } from 'react';
 
-function LiveLogger(props: { data: IBasePacket[] }) {
+function LiveLogger(props: { data: IRawPacket[] }) {
 	// Way around for react-query not updating the state
-	const [ws, selectedPacketId, setLogState] = useSession((state) => [state.ws, state.selectedPacket, state.setLogState]);
+	const [ws, selectedPacketId, setSelectedPacketId, setLogState] = useSession((state) => [state.ws, state.selectedPacket, state.setSelectedPacket, state.setLogState]);
+	const [selectedPacket, setSelectedPacket] = useState<{[key: string]: any} | null>(null);
+	const [cachedPackets, setCachedPackets] = useState<
+		{ [key: string]: { [key: string]: any } }
+	>({});
 
 	const onMessage = useCallback(
 		(event: MessageEvent) => {
-			const packetData = JSON.parse(event.data);
+			const packetData: IWSSPacket = JSON.parse(event.data);
 
-			if (packetData.type === "loggingState") {
-				setLogState(packetData.state);
+			if (packetData.id === PacketId.PACKETLOGGER_LOGSTATE) {
+				setLogState(packetData.data);
+			} else if (packetData.id === PacketId.MC_PACKET_INFO) {
+				setSelectedPacketId(packetData.data.index);
+				setSelectedPacket(packetData.data.packetData);
+				setCachedPackets((prev) => ({
+					...prev,
+					[packetData.data.index]: packetData.data.packetData,
+				}));
 			}
 		},
-		[setLogState]
+		[setLogState, setSelectedPacketId]
 	);
 
 	useEffect(() => {
@@ -50,8 +62,26 @@ function LiveLogger(props: { data: IBasePacket[] }) {
 					);
 				}}
 			/>
-			<LogList data={props.data} />
-			<Inspector data={props.data} selectedPacketId={selectedPacketId} />
+			<LogList data={props.data} selectedPacketBody={selectedPacket} onLogClick={(index: number) => {
+				if (ws === null) return;
+				if (index === selectedPacketId) {
+					setSelectedPacketId(null);
+					setSelectedPacket(null);
+					return;
+				}
+				
+				if (cachedPackets[index]) {
+					setSelectedPacketId(index);
+					setSelectedPacket(cachedPackets[index]);
+					return;
+				}
+
+				ws.send(JSON.stringify({
+					id: PacketId.REQUEST_MC_PACKET_INFO,
+					data: index
+				}));
+			}} />
+			<Inspector data={props.data} selectedPacketId={selectedPacketId} body={selectedPacket} />
 		</div>
 	);
 }

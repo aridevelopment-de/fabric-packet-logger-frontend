@@ -1,15 +1,19 @@
-import { Code } from "@mantine/core";
+import { Code, Loader } from "@mantine/core";
 import { useMemo, useEffect, useRef } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import styles from "./loglist.module.css";
-import { IBasePacket } from "../../types";
+import { IRawPacket, NetworkStateNames } from "../../types";
 import { useSession, useSettings } from "../../hooks/useSettings";
+import { PacketMetadata, metadataManager } from "../../../utils/metadatamanager";
+import { capitalize } from "../../../utils/stringutils";
 
-const LogList = (props: {data: IBasePacket[]}) => {
-	const [selectedPacket, setSelectedPacket] = useSession((state) => [
-		state.selectedPacket, state.setSelectedPacket
-	])
+const LogList = (props: {
+	data: IRawPacket[];
+	selectedPacketBody: { [key: string]: any } | null;
+	onLogClick: (index: number) => void;
+}) => {
+	const [selectedPacket, setSelectedPacket] = useSession((state) => [state.selectedPacket, state.setSelectedPacket]);
 	const [autoScroll, whitelist, blacklist] = useSettings((state) => [
 		state.autoScroll,
 		state.whitelistedPackets,
@@ -44,21 +48,23 @@ const LogList = (props: {data: IBasePacket[]}) => {
 				let returnable: JSX.Element | null = (
 					<LogLine
 						key={index}
-						timestamp={item.timestamp}
-						data={item.data}
+						data={item}
 						selected={index === selectedPacket}
-						onClick={() => setSelectedPacket(index === selectedPacket ? null : index)}
+						onClick={() => {
+							props.onLogClick(index);
+						}}
+						body={index === selectedPacket ? props.selectedPacketBody : null}
 					/>
 				);
 
 				if (whitelist.length > 0) {
-					if (!whitelist.includes(item.data.id)) {
+					if (!whitelist.includes(item.id)) {
 						returnable = null;
 					}
 				}
 
 				if (blacklist.length > 0) {
-					if (blacklist.includes(item.data.id)) {
+					if (blacklist.includes(item.id)) {
 						returnable = null;
 					}
 				}
@@ -70,22 +76,53 @@ const LogList = (props: {data: IBasePacket[]}) => {
 };
 
 export const LogLine = (props: {
-	timestamp: IBasePacket["timestamp"];
-	data: IBasePacket["data"];
+	data: IRawPacket;
 	selected: boolean;
 	onClick: Function;
+	body: { [key: string]: any } | null;
 }) => {
-	const stringifiedData = useMemo(() => JSON.stringify(props.data.data, null, 2), [props.data.data]);
+	const stringifiedData = useMemo(() => JSON.stringify(props.body, null, 2), [props.body]);
+	const metadata: PacketMetadata | null = useMemo(() => {
+		let packetMeta = null;
+
+		try {
+			// TODO: Atm we assume the packet is clientbound as serverbound packets are not yet supported
+			packetMeta =
+				// @ts-ignore
+				metadataManager.getMetadata().clientbound[NetworkStateNames[props.data.networkState]][
+					"0x" + props.data.id.toString(16).padStart(2, "0")
+				];
+		} catch (e) {
+			console.error(e);
+			return null;
+		}
+
+		return packetMeta;
+	}, [props]);
+
+	if (!metadata) return null;
 
 	return (
 		<div className={styles.line} onClick={() => props.onClick()}>
-			<div className={styles.timestamp}>{new Date(props.timestamp).toLocaleTimeString()}</div>
+			<div className={styles.timestamp}>{new Date(props.data.timestamp).toLocaleTimeString()}</div>
 			<div className={styles.packet_name}>
-				{props.data.name}{" "}
-				<span className={styles.legacy_packet_name}>({props.data.legacyName + "S2CPacket"})</span>
+				{metadata.name}{" "}
+				<span className={styles.legacy_packet_name}>
+					(
+					{capitalize(NetworkStateNames[props.data.networkState]) +
+						" 0x" +
+						props.data.id.toString(16).padStart(2, "0")}
+					)
+				</span>
 			</div>
 
-			{props.selected && (
+			{props.selected && props.body === null && (
+				<div className={styles.expanded}>
+					<Loader variant="dots" />
+				</div>
+			)}
+
+			{props.selected && props.body !== null && (
 				<div className={styles.expanded}>
 					{stringifiedData.length < 1000 ? (
 						<SyntaxHighlighter language="json" style={atomOneDark}>

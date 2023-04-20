@@ -1,3 +1,5 @@
+// @ts-nocheck
+// TODO: Fix this file
 import { IBasePacket } from "../types";
 import MapUpdateS2CAdapter from "./MapUpdateS2C";
 

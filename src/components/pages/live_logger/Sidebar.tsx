@@ -1,10 +1,10 @@
 import { Button, Checkbox, Divider, Group, MultiSelect, SegmentedControl } from "@mantine/core";
 import { FileExport } from "tabler-icons-react";
-import { useSession, useSettings } from "../../hooks/useSettings";
+import { LogState, useSession, useSettings } from "../../hooks/useSettings";
 import styles from "./sidebar.module.css";
-import { IBasePacket } from "../../types";
+import { IRawPacket } from "../../types";
 
-const Sidebar = (props: { onReconnect: () => void, setData: (newData: IBasePacket[]) => void, onDownload: () => void }) => {
+const Sidebar = (props: { onReconnect: () => void, setData: (newData: IRawPacket[]) => void, onDownload: () => void }) => {
 	const [
 		whitelist,
 		blacklist,
@@ -50,13 +50,14 @@ const Sidebar = (props: { onReconnect: () => void, setData: (newData: IBasePacke
 						{ label: "Logging", value: "logging" },
 						{ label: "Not logging", value: "off" },
 					]}
-					value={logState}
+					// TODO: Temporary fix
+					value={logState === LogState.LOGGING ? "logging" : "off"}
 					onChange={(value: "logging" | "off") => {
 						if (ws) {
 							ws.send(JSON.stringify({ type: "loggingState", state: value }));
 						}
 
-						setLogState(value);
+						setLogState(value === "logging" ? LogState.LOGGING : LogState.OFF);
 					}}
 					style={{ width: "fit-content" }}
 				/>
@@ -75,8 +76,8 @@ const Sidebar = (props: { onReconnect: () => void, setData: (newData: IBasePacke
 				<span className={styles.title}>Packet whitelist</span>
 				<MultiSelect
 					data={registeredPackets}
-					value={whitelist}
-					onChange={setWhitelist}
+					value={whitelist.map(a => String(a))}
+					onChange={(v: string[]) => setWhitelist(v.map(a => Number(a)))}
 					clearable
 					searchable
 					placeholder="Pick all packets that you want to see"
@@ -87,8 +88,8 @@ const Sidebar = (props: { onReconnect: () => void, setData: (newData: IBasePacke
 				<span className={styles.title}>Packet Blacklist</span>
 				<MultiSelect
 					data={registeredPackets}
-					value={blacklist}
-					onChange={setBlacklist}
+					value={blacklist.map(a => String(a))}
+					onChange={(v: string[]) => setBlacklist(v.map(a => Number(a)))}
 					clearable
 					searchable
 					placeholder="Pick all packets that you don't want to see"

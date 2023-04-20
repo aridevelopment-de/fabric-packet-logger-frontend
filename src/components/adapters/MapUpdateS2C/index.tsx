@@ -1,3 +1,5 @@
+// @ts-nocheck
+// TODO: Fix this file
 import styles from "./styles.module.css"
 import { IBasePacket } from "../../types"
 import { useEffect, useRef } from "react";

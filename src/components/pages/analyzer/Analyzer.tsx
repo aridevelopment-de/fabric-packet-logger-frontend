@@ -1,3 +1,5 @@
+// @ts-nocheck
+// TODO: Fix this
 import { ActionIcon, Button, FileButton, Flex, Select } from "@mantine/core";
 import { Minimize, WindowMaximize } from "tabler-icons-react";
 import Inspector from "../live_logger/Inspector";

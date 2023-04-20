@@ -6,7 +6,9 @@ import ReactDOM from 'react-dom/client';
 import CustomRouter from './CustomRouter';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
+import { metadataManager } from './utils/metadatamanager';
 
+metadataManager.fetchMetadata();
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );

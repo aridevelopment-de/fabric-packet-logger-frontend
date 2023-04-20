@@ -1,18 +1,39 @@
-export interface IBasePacket {
+export enum PacketId {
+	PACKETLOGGER_LOGSTATE,
+	MC_PACKET_RECEIVED,
+	MC_PACKET_SENT,
+	REQUEST_MC_PACKET_INFO,
+	MC_PACKET_INFO
+}
+
+export interface IWSSPacket {
+	id: PacketId;
+	data: any;
+}
+
+export enum NetworkState {
+	HANDSHAKING = 0,
+	PLAY = 1,
+	STATUS = 2,
+	LOGIN = 3,
+}
+
+export const NetworkStateNames = [
+	"handshaking",
+	"play",
+	"status",
+	"login",
+];
+
+export enum NetworkDirection {
+	CLIENTBOUND = 0,
+	SERVERBOUND = 1,
+}
+
+export interface IRawPacket {
+	id: number;
 	timestamp: number;
-	data: {
-		name: string;
-		legacyName: string;
-		id: string;
-		data: any;
-	};
-}
-
-interface IDescriptionPart {
-	general: string;
-	wikiVgNotes?: string;
-}
-
-export type IDescription = IDescriptionPart & {
-	[key in Exclude<string, keyof IDescriptionPart>]: string;
+	index: number;
+	networkState: NetworkState;
+	direction: NetworkDirection;
 }
