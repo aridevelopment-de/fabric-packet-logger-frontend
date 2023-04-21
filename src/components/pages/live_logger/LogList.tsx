@@ -13,7 +13,7 @@ const LogList = (props: {
 	selectedPacketBody: { [key: string]: any } | null;
 	onLogClick: (index: number) => void;
 }) => {
-	const [selectedPacket, setSelectedPacket] = useSession((state) => [state.selectedPacket, state.setSelectedPacket]);
+	const [selectedPacket] = useSession((state) => [state.selectedPacket]);
 	const [autoScroll, whitelist, blacklist] = useSettings((state) => [
 		state.autoScroll,
 		state.whitelistedPackets,
@@ -101,8 +101,6 @@ export const LogLine = (props: {
 	}, [props]);
 
 	if (!metadata) return null;
-
-	console.log(props.data)
 
 	return (
 		<div className={styles.line} onClick={() => props.onClick()}>
