@@ -8,8 +8,15 @@ import LogList from "./LogList";
 import Sidebar from "./Sidebar";
 import { useState } from 'react';
 
+/*
+	TODO for tomorrow:
+	- Fix logging/notlogging switch
+	- Add functionality to export button
+	- Fix Log analyzer
+	- Whenever websocket disconnects, clear cached data
+*/
+
 function LiveLogger(props: { data: IRawPacket[] }) {
-	// Way around for react-query not updating the state
 	const [ws, selectedPacketId, setSelectedPacketId, setLogState] = useSession((state) => [state.ws, state.selectedPacket, state.setSelectedPacket, state.setLogState]);
 	const [selectedPacket, setSelectedPacket] = useState<{[key: string]: any} | null>(null);
 	const [cachedPackets, setCachedPackets] = useState<
@@ -43,6 +50,18 @@ function LiveLogger(props: { data: IRawPacket[] }) {
 		}
 	}, [ws, onMessage]);
 
+	useEffect(() => {
+		EventHandler.on(EventType.DATA_CLEAR, "livelogger", () => {
+			setSelectedPacketId(null);
+			setSelectedPacket(null);
+			setCachedPackets({});
+		});
+
+		return () => {
+			EventHandler.off(EventType.DATA_CLEAR, "livelogger");
+		};
+	})
+
 	return (
 		<div
 			style={{
@@ -52,7 +71,6 @@ function LiveLogger(props: { data: IRawPacket[] }) {
 			}}
 		>
 			<Sidebar
-				setData={() => EventHandler.emit(EventType.DATA_CLEAR)}
 				onReconnect={() => ws ? ws.reconnect() : void 0}
 				onDownload={() => {
 					const date = new Date();
@@ -64,17 +82,21 @@ function LiveLogger(props: { data: IRawPacket[] }) {
 			/>
 			<LogList data={props.data} selectedPacketBody={selectedPacket} onLogClick={(index: number) => {
 				if (ws === null) return;
+				
 				if (index === selectedPacketId) {
 					setSelectedPacketId(null);
 					setSelectedPacket(null);
 					return;
 				}
-				
+
 				if (cachedPackets[index]) {
 					setSelectedPacketId(index);
 					setSelectedPacket(cachedPackets[index]);
 					return;
 				}
+
+				setSelectedPacketId(null);
+				setSelectedPacket(null);
 
 				ws.send(JSON.stringify({
 					id: PacketId.REQUEST_MC_PACKET_INFO,

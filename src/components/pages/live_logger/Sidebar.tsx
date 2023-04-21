@@ -2,9 +2,9 @@ import { Button, Checkbox, Divider, Group, MultiSelect, SegmentedControl } from 
 import { FileExport } from "tabler-icons-react";
 import { LogState, useSession, useSettings } from "../../hooks/useSettings";
 import styles from "./sidebar.module.css";
-import { IRawPacket } from "../../types";
+import EventHandler, { EventType } from "../../../utils/eventhandler";
 
-const Sidebar = (props: { onReconnect: () => void, setData: (newData: IRawPacket[]) => void, onDownload: () => void }) => {
+const Sidebar = (props: { onReconnect: () => void, onDownload: () => void }) => {
 	const [
 		whitelist,
 		blacklist,
@@ -65,7 +65,7 @@ const Sidebar = (props: { onReconnect: () => void, setData: (newData: IRawPacket
 					<Button onClick={props.onReconnect}>Reconnect</Button>
 					<Button color="red" onClick={() => {
 						setSelectedPacket(null);
-						props.setData([]);
+						EventHandler.emit(EventType.DATA_CLEAR);
 					}}>
 						Clear
 					</Button>

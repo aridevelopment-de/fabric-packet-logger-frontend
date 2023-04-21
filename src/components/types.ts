@@ -3,7 +3,8 @@ export enum PacketId {
 	MC_PACKET_RECEIVED,
 	MC_PACKET_SENT,
 	REQUEST_MC_PACKET_INFO,
-	MC_PACKET_INFO
+	MC_PACKET_INFO,
+	REQUEST_CLEAR
 }
 
 export interface IWSSPacket {

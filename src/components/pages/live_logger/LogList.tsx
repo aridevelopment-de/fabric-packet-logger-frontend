@@ -102,6 +102,8 @@ export const LogLine = (props: {
 
 	if (!metadata) return null;
 
+	console.log(props.data)
+
 	return (
 		<div className={styles.line} onClick={() => props.onClick()}>
 			<div className={styles.timestamp}>{new Date(props.data.timestamp).toLocaleTimeString()}</div>

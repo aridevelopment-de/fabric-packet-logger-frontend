@@ -88,6 +88,7 @@ const WebsocketHandler = (props: { children: JSX.Element }) => {
     ws.onclose = () => {
       console.info("Disconnected from server");
       setConnected(false);
+      EventHandler.emit(EventType.DATA_CLEAR);
     }
 
     return () => {
@@ -96,7 +97,16 @@ const WebsocketHandler = (props: { children: JSX.Element }) => {
   }, [setConnected, setWs, setRegisteredPackets]);
 
   useEffect(() => {
-    EventHandler.on(EventType.DATA_CLEAR, "websocket-handler", () => setData([]));
+    EventHandler.on(EventType.DATA_CLEAR, "websocket-handler", () => {
+      setData([]);
+      
+      if (ws !== null) {
+        ws.send(JSON.stringify({
+          id: PacketId.REQUEST_CLEAR,
+          data: null,
+        }));
+      }
+    });
     
     return () => {
       EventHandler.off(EventType.DATA_CLEAR, "websocket-handler");
