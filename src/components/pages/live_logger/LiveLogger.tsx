@@ -10,10 +10,8 @@ import { useState } from 'react';
 
 /*
 	TODO for tomorrow:
-	- Fix logging/notlogging switch
 	- Add functionality to export button
 	- Fix Log analyzer
-	- Whenever websocket disconnects, clear cached data
 */
 
 function LiveLogger(props: { data: IRawPacket[] }) {

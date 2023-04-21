@@ -3,6 +3,7 @@ import { FileExport } from "tabler-icons-react";
 import { LogState, useSession, useSettings } from "../../hooks/useSettings";
 import styles from "./sidebar.module.css";
 import EventHandler, { EventType } from "../../../utils/eventhandler";
+import { PacketId } from "../../types";
 
 const Sidebar = (props: { onReconnect: () => void, onDownload: () => void }) => {
 	const [
@@ -53,11 +54,13 @@ const Sidebar = (props: { onReconnect: () => void, onDownload: () => void }) => 
 					// TODO: Temporary fix
 					value={logState === LogState.LOGGING ? "logging" : "off"}
 					onChange={(value: "logging" | "off") => {
+						const newLogState = value === "logging" ? LogState.LOGGING : LogState.OFF;
+
 						if (ws) {
-							ws.send(JSON.stringify({ type: "loggingState", state: value }));
+							ws.send(JSON.stringify({ id: PacketId.PACKETLOGGER_LOGSTATE, data: newLogState }));
 						}
 
-						setLogState(value === "logging" ? LogState.LOGGING : LogState.OFF);
+						setLogState(newLogState);
 					}}
 					style={{ width: "fit-content" }}
 				/>
