@@ -1,9 +1,11 @@
 import { Button, Checkbox, Divider, Group, MultiSelect, SegmentedControl } from "@mantine/core";
 import { FileExport } from "tabler-icons-react";
-import { LogState, useSession, useSettings } from "../../hooks/useSettings";
-import styles from "./sidebar.module.css";
 import EventHandler, { EventType } from "../../../utils/eventhandler";
+import { Metadata, metadataManager } from "../../../utils/metadatamanager";
+import { useAsyncMemo } from "../../hooks/useAsyncMemo";
+import { LogState, useSession, useSettings } from "../../hooks/useSettings";
 import { PacketId } from "../../types";
+import styles from "./sidebar.module.css";
 
 const Sidebar = (props: { onReconnect: () => void, onDownload: () => void }) => {
 	const [
@@ -26,14 +28,40 @@ const Sidebar = (props: { onReconnect: () => void, onDownload: () => void }) => 
 		state.setOnlySaveFiltered,
 	]);
 
-	const [ws, connected, logState, registeredPackets, setLogState, setSelectedPacket] = useSession((state) => [
+	const [ws, connected, logState, setLogState, setSelectedPacket] = useSession((state) => [
 		state.ws,
 		state.connected,
 		state.logState,
-		state.registeredPackets,
 		state.setLogState,
 		state.setSelectedPacket
 	]);
+
+	const initialWhiteBlackListData = useAsyncMemo(async () => {
+		// { value: 'react', label: 'React' },
+		// { value: 'play-0x4E', label: 'SetCenterChunk' }
+		const meta: Metadata | null = await metadataManager.getMetadata();
+		if (meta === null) return [];
+
+		// for now we only care about clientbound packets
+		const clientbound = meta.clientbound;
+		const returnable: { value: string, label: string }[] = [];
+
+		for (let category in clientbound) {
+			for (let packetId in clientbound[category as keyof typeof clientbound]) {
+				const packet = clientbound[category as keyof typeof clientbound][packetId];
+				const name = packet.name;
+
+				returnable.push({
+					value: `${category}-${packetId}`,
+					label: name
+				});
+			}
+		}
+
+		return returnable;
+	}, []);
+
+	console.log(initialWhiteBlackListData)
 
 	return (
 		<div className={styles.container}>
@@ -78,9 +106,9 @@ const Sidebar = (props: { onReconnect: () => void, onDownload: () => void }) => 
 			<div className={styles.packet_whitelist}>
 				<span className={styles.title}>Packet whitelist</span>
 				<MultiSelect
-					data={registeredPackets}
-					value={whitelist.map(a => String(a))}
-					onChange={(v: string[]) => setWhitelist(v.map(a => Number(a)))}
+					data={initialWhiteBlackListData ?? []}
+					value={whitelist}
+					onChange={setWhitelist}
 					clearable
 					searchable
 					placeholder="Pick all packets that you want to see"
@@ -90,9 +118,9 @@ const Sidebar = (props: { onReconnect: () => void, onDownload: () => void }) => 
 			<div className={styles.packet_blacklist}>
 				<span className={styles.title}>Packet Blacklist</span>
 				<MultiSelect
-					data={registeredPackets}
-					value={blacklist.map(a => String(a))}
-					onChange={(v: string[]) => setBlacklist(v.map(a => Number(a)))}
+					data={initialWhiteBlackListData ?? []}
+					value={blacklist}
+					onChange={setBlacklist}
 					clearable
 					searchable
 					placeholder="Pick all packets that you don't want to see"

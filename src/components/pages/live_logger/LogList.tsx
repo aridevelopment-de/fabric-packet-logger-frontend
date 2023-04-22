@@ -7,6 +7,7 @@ import { IRawPacket, NetworkStateNames } from "../../types";
 import { useSession, useSettings } from "../../hooks/useSettings";
 import { PacketMetadata, metadataManager } from "../../../utils/metadatamanager";
 import { capitalize } from "../../../utils/stringutils";
+import { useAsyncMemo } from "../../hooks/useAsyncMemo";
 
 const LogList = (props: {
 	data: IRawPacket[];
@@ -57,14 +58,17 @@ const LogList = (props: {
 					/>
 				);
 
+				const networkState = NetworkStateNames[item.networkState].toLowerCase();
+				const formattedId = `${networkState}-0x${item.id.toString(16).padStart(2, "0")}`;
+
 				if (whitelist.length > 0) {
-					if (!whitelist.includes(item.id)) {
+					if (!whitelist.includes(formattedId)) {
 						returnable = null;
 					}
 				}
 
 				if (blacklist.length > 0) {
-					if (blacklist.includes(item.id)) {
+					if (blacklist.includes(formattedId)) {
 						returnable = null;
 					}
 				}
@@ -82,14 +86,16 @@ export const LogLine = (props: {
 	body: { [key: string]: any } | null;
 }) => {
 	const stringifiedData = useMemo(() => JSON.stringify(props.body, null, 2), [props.body]);
-	const metadata: PacketMetadata | null = useMemo(() => {
+	const metadata: PacketMetadata | null = useAsyncMemo(async () => {
+		const meta = await metadataManager.getMetadata();
+		if (meta === null) return null;
 		let packetMeta = null;
 
 		try {
 			// TODO: Atm we assume the packet is clientbound as serverbound packets are not yet supported
 			packetMeta =
 				// @ts-ignore
-				metadataManager.getMetadata().clientbound[NetworkStateNames[props.data.networkState]][
+				meta.clientbound[NetworkStateNames[props.data.networkState]][
 					"0x" + props.data.id.toString(16).padStart(2, "0")
 				];
 		} catch (e) {

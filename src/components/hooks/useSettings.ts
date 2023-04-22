@@ -19,13 +19,13 @@ export enum LogState {
 }
 
 export interface SettingsState {
-  whitelistedPackets: number[];
-  blacklistedPackets: number[];
+  whitelistedPackets: string[];
+  blacklistedPackets: string[];
   autoScroll: boolean;
   onlySaveFiltered: boolean;
 
-  setWhitelistedPackets: (packets: number[]) => void;
-  setBlacklistedPackets: (packets: number[]) => void;
+  setWhitelistedPackets: (packets: string[]) => void;
+  setBlacklistedPackets: (packets: string[]) => void;
   setAutoScroll: (autoScroll: boolean) => void;
   setOnlySaveFiltered: (onlySaveFiltered: boolean) => void;
 }
@@ -34,16 +34,13 @@ export interface SessionState {
   logState: LogState;
   ws: ReconnectingWebSocket | null;
   connected: boolean;
-  // TODO: Make selectedPacket IBasePacket
   selectedPacket: number | null;
-  registeredPackets: Array<{value: string; label: string}>;
   page: CurrentPage;
 
   setLogState: (logState: LogState) => void;
   setWs: (ws: ReconnectingWebSocket | null) => void;
   setConnected: (connected: boolean) => void;
   setSelectedPacket: (selectedPacket: number | null) => void;
-  setRegisteredPackets: (registeredPackets: Array<{value: string; label: string}>) => void;
   setPage: (page: CurrentPage) => void;
 }
 
@@ -75,13 +72,11 @@ export const useSession = create<SessionState>()(
       ws: null,
       connected: false,
       selectedPacket: null,
-      registeredPackets: [],
       page: CurrentPage.LIVE_LOGGER,
       setLogState: (logState) => set({ logState }),
       setWs: (ws) => set({ ws }),
       setConnected: (connected) => set({ connected }),
       setSelectedPacket: (selectedPacket) => set({ selectedPacket }),
-      setRegisteredPackets: (registeredPackets) => set({ registeredPackets }),
       setPage: (page) => set({ page }),
     })
   )

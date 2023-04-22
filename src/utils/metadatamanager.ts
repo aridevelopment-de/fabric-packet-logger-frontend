@@ -81,10 +81,11 @@ class MetadataManager {
     return true;
   }
 
-  public getMetadata(): Metadata | null {
+  public async getMetadata(): Promise<Metadata | null> {
+    // TODO: Make promise
     if (this.metadata === null) {
       console.info("Metadata is not loaded yet. Trying to load metadata...");
-      this.fetchMetadata();
+      await this.fetchMetadata();
       return null;
     }
 

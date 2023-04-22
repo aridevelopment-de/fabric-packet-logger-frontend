@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { SettingsState, useSession, useSettings } from "./components/hooks/useSettings";
 import EventHandler, { EventType } from './utils/eventhandler';
-import { IRawPacket, IWSSPacket, PacketId } from "./components/types";
+import { IRawPacket, IWSSPacket, NetworkStateNames, PacketId } from "./components/types";
 
 const distributeRawPacket = (data: Array<number>[]): IRawPacket[]  => {
   return data.map((d) => {
@@ -18,11 +18,10 @@ const distributeRawPacket = (data: Array<number>[]): IRawPacket[]  => {
 
 const WebsocketHandler = (props: { children: JSX.Element }) => {
 	const [data, setData] = useState<IRawPacket[]>([]);
-	const [ws, setWs, setConnected, setRegisteredPackets] = useSession((state) => [
+	const [ws, setWs, setConnected] = useSession((state) => [
 		state.ws,
 		state.setWs,
 		state.setConnected,
-		state.setRegisteredPackets,
 	]);
   const [whitelistData, blacklistData, onlySaveFiltered] = useSettings((state: SettingsState) => [
     state.whitelistedPackets,
@@ -34,6 +33,7 @@ const WebsocketHandler = (props: { children: JSX.Element }) => {
     const packetData: IWSSPacket = JSON.parse(event.data);
 
     if (packetData.id === PacketId.MC_PACKET_RECEIVED) {
+      // [packet id, unix milli-timestamp, unique index, networkstate, direction]
       if (!onlySaveFiltered) {
         setData((d) => [
           ...d,
@@ -42,26 +42,36 @@ const WebsocketHandler = (props: { children: JSX.Element }) => {
 
         return;
       } else {
-        let shallAdd = true;
+        let packetsToAdd: Array<number>[] = [];
 
-        if (whitelistData.length > 0) {
-          if (!whitelistData.includes(packetData.data[0])) {
-            shallAdd = false;
+        for (let rawPacket of packetData.data) {
+          let shallAdd = true;
+          const packetId = rawPacket[0];
+          const networkState = NetworkStateNames[rawPacket[3]];
+          const formattedId = `${networkState}-0x${packetId.toString(16).padStart(2, "0")}`;
+
+          if (whitelistData.length > 0) {
+            if (!whitelistData.includes(formattedId)) {
+              shallAdd = false;
+            }
+          }
+
+          if (blacklistData.length > 0) {
+            if (blacklistData.includes(formattedId)) {
+              shallAdd = false;
+            }
+          }
+
+          if (shallAdd) {
+            packetsToAdd.push(rawPacket);
           }
         }
 
-        if (blacklistData.length > 0) {
-          if (blacklistData.includes(packetData.data[0])) {
-            shallAdd = false;
-          }
-        }
-
-        if (shallAdd) {
-          setData((d) => [
-            ...d,
-            ...distributeRawPacket(packetData.data),
-          ]);
-        }
+        if (packetsToAdd.length === 0) return;
+        setData((d) => [
+          ...d,
+          ...distributeRawPacket(packetsToAdd),
+        ]);
       }
     }
   }, [onlySaveFiltered, whitelistData, blacklistData]);
@@ -94,7 +104,7 @@ const WebsocketHandler = (props: { children: JSX.Element }) => {
     return () => {
       ws.close();
     }
-  }, [setConnected, setWs, setRegisteredPackets]);
+  }, [setConnected, setWs]);
 
   useEffect(() => {
     EventHandler.on(EventType.DATA_CLEAR, "websocket-handler", () => {

@@ -2,7 +2,7 @@ import { Code, Table, Text } from "@mantine/core";
 import { ADAPTERS } from "../../adapters/adapters";
 import { IRawPacket, NetworkDirection, NetworkStateNames } from "../../types";
 import styles from "./inspector.module.css";
-import { PacketMetadata, metadataManager } from "../../../utils/metadatamanager";
+import { Metadata, PacketMetadata, metadataManager } from "../../../utils/metadatamanager";
 import { useState, useEffect } from "react";
 
 const COLORS = {
@@ -25,23 +25,25 @@ const Inspector = (props: { data: IRawPacket[]; body: { [key: string]: any } | n
 
 		const selectedPacket = props.data[props.selectedPacketId];
 		if (selectedPacket === undefined) return;
-		if (metadataManager.getMetadata() === null) return;
 
-		let packetMeta = null;
+		metadataManager.getMetadata().then((meta: Metadata | null) => {
+			if (meta === null) return;
+			let packetMeta = null;
 
-		try {
-			// TODO: Atm we assume the packet is clientbound as serverbound packets are not yet supported
-			packetMeta =
-				// @ts-ignore
-				metadataManager.getMetadata().clientbound[NetworkStateNames[selectedPacket.networkState]][
-					"0x" + selectedPacket.id.toString(16).padStart(2, "0")
-				];
-		} catch (e) {
-			console.error(e);
-			return;
-		}
-
-		setMetadata(packetMeta);
+			try {
+				// TODO: Atm we assume the packet is clientbound as serverbound packets are not yet supported
+				packetMeta =
+					// @ts-ignore
+					meta.clientbound[NetworkStateNames[selectedPacket.networkState]][
+						"0x" + selectedPacket.id.toString(16).padStart(2, "0")
+					];
+			} catch (e) {
+				console.error(e);
+				return;
+			}
+	
+			setMetadata(packetMeta);
+		});
 	}, [props]);
 
 	if (props.selectedPacketId === null) return null;
