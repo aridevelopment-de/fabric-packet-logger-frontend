@@ -7,7 +7,7 @@ import { LogState, useSession, useSettings } from "../../hooks/useSettings";
 import { PacketId } from "../../types";
 import styles from "./sidebar.module.css";
 
-const Sidebar = (props: { onReconnect: () => void, onDownload: () => void }) => {
+const Sidebar = (props: { onReconnect: () => void }) => {
 	const [
 		whitelist,
 		blacklist,
@@ -60,8 +60,6 @@ const Sidebar = (props: { onReconnect: () => void, onDownload: () => void }) => 
 
 		return returnable;
 	}, []);
-
-	console.log(initialWhiteBlackListData)
 
 	return (
 		<div className={styles.container}>
@@ -129,7 +127,17 @@ const Sidebar = (props: { onReconnect: () => void, onDownload: () => void }) => 
 			</div>
 			<Divider my="xl" />
 			<div className={styles.config}>
-				<Button color="orange" leftIcon={<FileExport />} onClick={props.onDownload}>Export</Button>
+				<Button color="orange" leftIcon={<FileExport />} onClick={() => {
+					if (ws === null) return;
+
+					ws.send(JSON.stringify({
+						id: PacketId.REQUEST_EXPORT,
+						data: {
+							whitelist: whitelist,
+							blacklist: blacklist, 
+						}
+					}))
+				}}>Export</Button>
 				<Checkbox
 					onChange={(e) => setAutoScroll(e.currentTarget.checked)}
 					checked={autoScroll}

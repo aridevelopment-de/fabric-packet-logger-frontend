@@ -1,17 +1,14 @@
-import { useCallback, useEffect } from "react";
-import { downloadContentBig } from "../../../utils/browserutils";
+import { useCallback, useEffect, useState } from "react";
 import EventHandler, { EventType } from "../../../utils/eventhandler";
 import { useSession } from "../../hooks/useSettings";
 import { IRawPacket, IWSSPacket, PacketId } from "../../types";
 import Inspector from "./Inspector";
 import LogList from "./LogList";
 import Sidebar from "./Sidebar";
-import { useState } from 'react';
 
 /*
 	TODO for tomorrow:
 	- Add functionality to export button
-	- Fix Log analyzer
 */
 
 function LiveLogger(props: { data: IRawPacket[] }) {
@@ -70,13 +67,6 @@ function LiveLogger(props: { data: IRawPacket[] }) {
 		>
 			<Sidebar
 				onReconnect={() => ws ? ws.reconnect() : void 0}
-				onDownload={() => {
-					const date = new Date();
-					downloadContentBig(
-						`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}-packet-dump.json`,
-						JSON.stringify(props.data, null)
-					);
-				}}
 			/>
 			<LogList data={props.data} selectedPacketBody={selectedPacket} onLogClick={(index: number) => {
 				if (ws === null) return;
