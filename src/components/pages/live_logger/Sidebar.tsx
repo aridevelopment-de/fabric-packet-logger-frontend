@@ -52,8 +52,8 @@ const Sidebar = (props: { onReconnect: () => void }) => {
 				const name = packet.name;
 
 				returnable.push({
-					value: `${category}-${packetId}`,
-					label: name
+					value: `cbound-${category}-${packetId}`,
+					label: name + " (S2C)"
 				});
 			}
 		}

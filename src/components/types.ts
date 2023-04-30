@@ -28,8 +28,8 @@ export const NetworkStateNames = [
 ];
 
 export enum NetworkDirection {
-	CLIENTBOUND = 0,
-	SERVERBOUND = 1,
+	SERVERBOUND = 0,
+	CLIENTBOUND = 1,
 }
 
 export interface IRawPacket {

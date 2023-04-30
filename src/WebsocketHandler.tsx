@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { SettingsState, useSession, useSettings } from "./components/hooks/useSettings";
 import EventHandler, { EventType } from './utils/eventhandler';
-import { IRawPacket, IWSSPacket, NetworkStateNames, PacketId } from "./components/types";
+import { IRawPacket, IWSSPacket, NetworkDirection, NetworkStateNames, PacketId } from "./components/types";
 
 const distributeRawPacket = (data: Array<number>[]): IRawPacket[]  => {
   return data.map((d) => {
@@ -47,8 +47,9 @@ const WebsocketHandler = (props: { children: JSX.Element }) => {
         for (let rawPacket of packetData.data) {
           let shallAdd = true;
           const packetId = rawPacket[0];
+          const networkSide = rawPacket[4] === NetworkDirection.CLIENTBOUND ? "cbound" : "sbound";
           const networkState = NetworkStateNames[rawPacket[3]];
-          const formattedId = `${networkState}-0x${packetId.toString(16).padStart(2, "0")}`;
+          const formattedId = `${networkSide}-${networkState}-0x${packetId.toString(16).padStart(2, "0")}`;
 
           if (whitelistData.length > 0) {
             if (!whitelistData.includes(formattedId)) {

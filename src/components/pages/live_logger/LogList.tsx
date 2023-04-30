@@ -3,7 +3,7 @@ import { useMemo, useEffect, useRef } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import styles from "./loglist.module.css";
-import { IRawPacket, NetworkStateNames } from "../../types";
+import { IRawPacket, NetworkDirection, NetworkStateNames } from "../../types";
 import { useSession, useSettings } from "../../hooks/useSettings";
 import { PacketMetadata, metadataManager } from "../../../utils/metadatamanager";
 import { capitalize } from "../../../utils/stringutils";
@@ -57,9 +57,11 @@ const LogList = (props: {
 						body={index === selectedPacket ? props.selectedPacketBody : null}
 					/>
 				);
-
+					
+				
+				const networkSide = item.direction === NetworkDirection.CLIENTBOUND ? "cbound" : "sbound";
 				const networkState = NetworkStateNames[item.networkState].toLowerCase();
-				const formattedId = `${networkState}-0x${item.id.toString(16).padStart(2, "0")}`;
+				const formattedId = `${networkSide}-${networkState}-0x${item.id.toString(16).padStart(2, "0")}`;
 
 				if (whitelist.length > 0) {
 					if (!whitelist.includes(formattedId)) {
