@@ -6,11 +6,6 @@ import Inspector from "./Inspector";
 import LogList from "./LogList";
 import Sidebar from "./Sidebar";
 
-/*
-	TODO for tomorrow:
-	- Add functionality to export button
-*/
-
 function LiveLogger(props: { data: IRawPacket[] }) {
 	const [ws, selectedPacketId, setSelectedPacketId, setLogState] = useSession((state) => [state.ws, state.selectedPacket, state.setSelectedPacket, state.setLogState]);
 	const [selectedPacket, setSelectedPacket] = useState<{[key: string]: any} | null>(null);
