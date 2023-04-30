@@ -56,3 +56,16 @@
   overflow-y: auto;
   width: fit-content;
 }
+
+.loader {
+  position: absolute;
+  z-index: 100000;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: grid;
+  place-items: center;
+}
+
+.loader > * {
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}

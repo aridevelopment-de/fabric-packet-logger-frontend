@@ -34,3 +34,18 @@ export const downloadContentBig = (filename: string, contents: string) => {
 	a.click();
 	document.body.removeChild(a);
 };
+
+/*
+	Prints a message to the console with a timestamp
+	
+	@param func - The function to time
+	@param args - The arguments to pass to the function
+	@returns The result of the function
+*/
+export const timeFunction = (func: Function, ...args: any[]): any => {
+	const start = performance.now();
+	const result = func(...args);
+	const end = performance.now();
+	console.log(`Function ${func.name} took ${end - start}ms to execute`);
+	return result;
+}

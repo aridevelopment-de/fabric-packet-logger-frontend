@@ -17,14 +17,11 @@ const COLORS = {
 	function: "rgb(200, 200, 200)",
 };
 
-const Inspector = (props: { data: IRawPacket[]; body: { [key: string]: any } | null; selectedPacketId: number | null }) => {
+const Inspector = (props: { rawSelected: IRawPacket | null | undefined; body: { [key: string]: any } | null }) => {
 	const [metadata, setMetadata] = useState<PacketMetadata | null>(null);
 
 	useEffect(() => {
-		if (props.selectedPacketId === null) return;
-
-		const selectedPacket = props.data[props.selectedPacketId];
-		if (selectedPacket === undefined) return;
+		if (props.rawSelected === undefined || props.rawSelected === null) return;
 
 		metadataManager.getMetadata().then((meta: Metadata | null) => {
 			if (meta === null) return;
@@ -34,25 +31,24 @@ const Inspector = (props: { data: IRawPacket[]; body: { [key: string]: any } | n
 				// TODO: Atm we assume the packet is clientbound as serverbound packets are not yet supported
 				packetMeta =
 					// @ts-ignore
-					meta.clientbound[NetworkStateNames[selectedPacket.networkState]][
-						"0x" + selectedPacket.id.toString(16).padStart(2, "0")
+					meta.clientbound[NetworkStateNames[props.rawSelected.networkState]][
+						// @ts-ignore
+						"0x" + props.rawSelected.id.toString(16).padStart(2, "0")
 					];
 			} catch (e) {
 				console.error(e);
 				return;
 			}
-	
+
 			setMetadata(packetMeta);
 		});
 	}, [props]);
 
-	if (props.selectedPacketId === null) return null;
-
-	const selectedPacket = props.data[props.selectedPacketId];
-	if (selectedPacket === undefined || metadata === null || props.body === null) return null;
+	if (props.rawSelected === undefined || props.rawSelected === null || metadata === null || props.body === null)
+		return null;
 
 	// @ts-ignore
-	const adapter: any = ADAPTERS[selectedPacket.id];
+	const adapter: any = ADAPTERS[props.rawSelected.id];
 
 	return (
 		<div className={styles.container}>
@@ -71,14 +67,14 @@ const Inspector = (props: { data: IRawPacket[]; body: { [key: string]: any } | n
 			<main>
 				<ul className={styles.meta}>
 					<li>
-						<b>Packet Id:</b> {"0x" + selectedPacket.id.toString(16).padStart(2, "0")}
+						<b>Packet Id:</b> {"0x" + props.rawSelected.id.toString(16).padStart(2, "0")}
 					</li>
 					<li>
-						<b>Packet category:</b> {NetworkStateNames[selectedPacket.networkState]}
+						<b>Packet category:</b> {NetworkStateNames[props.rawSelected.networkState]}
 					</li>
 					<li>
 						<b>Direction:</b>{" "}
-						{selectedPacket.direction === NetworkDirection.CLIENTBOUND
+						{props.rawSelected.direction === NetworkDirection.CLIENTBOUND
 							? "Server ->; Client"
 							: "Client -> Server"}
 					</li>
@@ -107,23 +103,43 @@ const Inspector = (props: { data: IRawPacket[]; body: { [key: string]: any } | n
 						<tbody>
 							{Object.keys(props.body).map((key, index) => {
 								// @ts-ignore
-                let value = props.body[key];
-                
-                if (typeof value === "object") {
-                  value = "Object"
-                }
+								let value = props.body[key];
 
-                const color = COLORS[typeof value];
-                value = JSON.stringify(value);
-                
-                return (
-                  <tr key={index}>
-                    <td><Code style={{fontSize: "0.9em", color: COLORS.key, fontFamily: "Jetbrains Mono, sans-serif"}}>{key}</Code></td>
-                    <td><Code style={{fontSize: "0.9em", color: color, fontFamily: "Jetbrains Mono, sans-serif"}}>{value}</Code></td>
-                    <td style={{fontSize: "1em"}}>{metadata.fields[key]}</td>
-                  </tr>
-                )
-              })}
+								if (typeof value === "object") {
+									value = "Object";
+								}
+
+								const color = COLORS[typeof value];
+								value = JSON.stringify(value);
+
+								return (
+									<tr key={index}>
+										<td>
+											<Code
+												style={{
+													fontSize: "0.9em",
+													color: COLORS.key,
+													fontFamily: "Jetbrains Mono, sans-serif",
+												}}
+											>
+												{key}
+											</Code>
+										</td>
+										<td>
+											<Code
+												style={{
+													fontSize: "0.9em",
+													color: color,
+													fontFamily: "Jetbrains Mono, sans-serif",
+												}}
+											>
+												{value}
+											</Code>
+										</td>
+										<td style={{ fontSize: "1em" }}>{metadata.fields[key]}</td>
+									</tr>
+								);
+							})}
 						</tbody>
 					</Table>
 				</div>

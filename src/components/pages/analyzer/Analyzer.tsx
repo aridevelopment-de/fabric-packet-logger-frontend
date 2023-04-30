@@ -1,45 +1,80 @@
-// @ts-nocheck
-// TODO: Fix this
-import { ActionIcon, Button, FileButton, Flex, Select } from "@mantine/core";
+import { ActionIcon, Button, FileButton, Flex, Loader, Select, Stack, Text } from "@mantine/core";
 import { Minimize, WindowMaximize } from "tabler-icons-react";
+import { analyzerDb } from "../../../db/db";
+import { useAnalyzerData } from "../../hooks/useAnalyzerData";
 import Inspector from "../live_logger/Inspector";
 import { LogLine } from "../live_logger/LogList";
 import styles from "./analyzer.module.css";
-import { useAnalyzerData } from "./useAnalyzerData";
-import { IBasePacket } from "../../types";
+import { IRawPacket } from "../../types";
+import { useState } from "react";
 
-/* Never ever use states for this, as states cause a big performance impact :( */
-let data: IBasePacket[] = [];
 
 const Analyzer = () => {
-	const [hasLog, selectedPacket, setSelectedPacket] = useAnalyzerData((state) => [
+	const [hasLog, selectedPacket, frontendView, setSelectedPacket] = useAnalyzerData((state) => [
 		state.hasLog,
 		state.selectedPacket,
+    state.frontendView,
 		state.setSelectedPacket,
 	]);
+  const [logLoading, setLogLoading] = useState(false);
 
 	return (
 		<div className={styles.container}>
-			<Meta />
+      {logLoading && (
+        <div className={styles.loader}>
+          <Stack align="center">
+            <Loader />
+            <Text align="center">
+              Processing log... This may take some seconds<br/>depending on the size of the log.
+            </Text>
+          </Stack>
+        </div>
+      )}
+			<Meta setLogLoading={setLogLoading} />
 
 			{hasLog && (
 				<div className={styles.content}>
 					<div className={styles.loglist}>
-						{data.map((item, index) => {
+						{frontendView.map((item) => {
 							return (
 								<LogLine
-                  key={index}
-									timestamp={item.timestamp}
-									data={item.data}
-									selected={index === selectedPacket}
-									onClick={() => setSelectedPacket(index === selectedPacket ? null : index)}
+                  key={item.index}
+									data={{
+                    id: item.id,
+                    timestamp: item.timestamp,
+                    index: item.index!,
+                    networkState: item.networkState,
+                    direction: item.direction,
+                  }}
+									selected={selectedPacket !== null && item.index === selectedPacket.index}
+									onClick={async () => {
+                    const record = await analyzerDb.getRecord(item.index!);
+
+                    if (record === undefined) {
+                      // TODO: User feedback
+                      throw new Error("Record not found");
+                    }
+
+                    if (selectedPacket === null) {
+                      setSelectedPacket(record);
+                      return;
+                    }
+
+                    if (selectedPacket.index === item.index) {
+                      setSelectedPacket(null);
+                      return;
+                    }
+
+                    setSelectedPacket(record);
+                  }}
+                  body={selectedPacket === null ? null : selectedPacket.data}
 								/>
 							);
 						})}
 					</div>
 					<Inspector
-            data={data}
-            selectedPacketId={selectedPacket}
+            rawSelected={selectedPacket as any as IRawPacket}
+            body={selectedPacket === null ? null : selectedPacket.data}
           />
 				</div>
 			)}
@@ -47,8 +82,8 @@ const Analyzer = () => {
 	);
 };
 
-const Meta = () => {
-	const [minimized, hasLog, mapping, logTitle, setMinimized, setHasLog, setMapping, setLogTitle] = useAnalyzerData((state) => [
+const Meta = (props: {setLogLoading: Function}) => {
+	const [minimized, hasLog, mapping, logTitle, setMinimized, setHasLog, setMapping, setLogTitle, setFrontendView, setSelectedPacket] = useAnalyzerData((state) => [
 		state.metaMinimized,
     state.hasLog,
 		state.mapping,
@@ -57,6 +92,8 @@ const Meta = () => {
 		state.setHasLog,
 		state.setMapping,
 		state.setLogTitle,
+    state.setFrontendView,
+    state.setSelectedPacket,
 	]);
 	return (
 		<div className={`${styles.meta} ${minimized ? styles.minimized : ""} ${hasLog ? styles.has_log : ""}`}>
@@ -95,24 +132,39 @@ const Meta = () => {
                     return;
                   }
 
+                  setSelectedPacket(null);
+                  setHasLog(false);
+                  setFrontendView([]);
+                  props.setLogLoading(true);
+
                   const d = JSON.parse(e.target.result as string);
-                  data = d;
-                  setHasLog(true);
+
+                  analyzerDb.clear().then(() => analyzerDb.addBulkJson(d).then(() => {
+                    analyzerDb.generateFrontViewData().then((data) => {
+                      props.setLogLoading(false);
+                      setFrontendView(data);
+                      setHasLog(true);
+                    });
+                  }));
+
                   setLogTitle(file.name);
                 };
                 reader.readAsText(file);
               }}
             >
               {(props) => (
-                <Button style={{ flex: "1 1" }} color="orange" {...props}>
+                <Button style={{ flex: "1 1" }} color="green" {...props}>
                   Import
                 </Button>
               )}
             </FileButton>
-            <Button color="green" style={{ flex: "1 1" }} disabled={!hasLog} onClick={() => {
-              alert("This is not implemented yet!")
+            <Button color="red" style={{ flex: "1 1" }} disabled={!hasLog} onClick={() => {
+              setLogTitle("");
+              setHasLog(false);
+              setFrontendView([]);
+              analyzerDb.clear();
             }}>
-              Upload
+              Clear
             </Button>
           </Flex>
           <Select
