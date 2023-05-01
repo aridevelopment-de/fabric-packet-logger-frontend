@@ -4,6 +4,7 @@ import { IRawPacket, NetworkDirection, NetworkStateNames } from "../../types";
 import styles from "./inspector.module.css";
 import { Metadata, PacketMetadata, metadataManager } from "../../../utils/metadatamanager";
 import { useState, useEffect } from "react";
+import React from "react";
 
 const COLORS = {
 	key: "rgb(209, 154, 102)",
@@ -48,7 +49,7 @@ const Inspector = (props: { rawSelected: IRawPacket | null | undefined; body: { 
 		return null;
 
 	// @ts-ignore
-	const adapter: any = ADAPTERS[props.rawSelected.id];
+	const adapter: any = ADAPTERS[`${props.rawSelected.direction === NetworkDirection.CLIENTBOUND ? 'cbound' : 'sbound'}-${NetworkStateNames[props.rawSelected.networkState]}-0x${props.rawSelected.id.toString(16).padStart(2, "0")}`];
 
 	return (
 		<div className={styles.container}>
@@ -143,14 +144,14 @@ const Inspector = (props: { rawSelected: IRawPacket | null | undefined; body: { 
 						</tbody>
 					</Table>
 				</div>
-				{/* {adapter !== undefined && (
+				{adapter !== undefined && (
           <div className={styles.extra}>
             <span className={styles.extraTitle}>Extra</span>
             <div className={styles.extraContent}>
-              {React.cloneElement(adapter, {data: selectedPacket.data.data})}
+              {React.cloneElement(adapter, {data: props.body})}
             </div>
           </div>
-        )} */}
+        )}
 			</main>
 		</div>
 	);

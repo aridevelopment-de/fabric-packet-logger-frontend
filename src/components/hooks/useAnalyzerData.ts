@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { IAnalyzerRecord } from "../../db/db";
+import { IAnalyzerRecord, IBaseAnalyzerRecord } from "../../db/db";
 
 export interface AnalyzerState {
 	hasLog: boolean;
@@ -7,14 +7,14 @@ export interface AnalyzerState {
 	mapping: "yarn" | "mojang" | "intermediary";
 	logTitle: string;
 	metaMinimized: boolean;
-	frontendView: Exclude<IAnalyzerRecord, "data">[];
+	frontendView: IBaseAnalyzerRecord[];
 
 	setHasLog: (hasLog: boolean) => void;
 	setSelectedPacket: (selectedPacket: IAnalyzerRecord | null) => void;
 	setMapping: (mapping: "yarn" | "mojang" | "intermediary") => void;
 	setLogTitle: (logTitle: string) => void;
 	setMetaMinimized: (metaMinimized: boolean) => void;
-	setFrontendView: (frontendView: Exclude<IAnalyzerRecord, "data">[]) => void;
+	setFrontendView: (frontendView: IBaseAnalyzerRecord[]) => void;
 }
 
 export const useAnalyzerData = create<AnalyzerState>()((set, get) => ({

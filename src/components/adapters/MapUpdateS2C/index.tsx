@@ -1,7 +1,4 @@
-// @ts-nocheck
-// TODO: Fix this file
 import styles from "./styles.module.css"
-import { IBasePacket } from "../../types"
 import { useEffect, useRef } from "react";
 import { Text } from "@mantine/core"
 
@@ -43,9 +40,10 @@ const useCanvas = (draw: any) => {
   return canvasRef
 }
 
-const MapUpdateS2CAdapter = (props: {data: IBasePacket['data']['data']}) => {
-  const packetData = props.data as MapUpdateData;
+const MapUpdateS2CAdapter = (props: {data: {[key: string]: any} | null}) => {
+  if (props.data === null) return null;
 
+  const packetData = props.data as MapUpdateData;
   if (packetData.updateData.data === undefined) {
     return <Text color="dimmed">No map data available.</Text>
   }
