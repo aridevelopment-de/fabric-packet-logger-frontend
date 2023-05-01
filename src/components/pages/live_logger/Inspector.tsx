@@ -76,7 +76,7 @@ const Inspector = (props: { rawSelected: IRawPacket | null | undefined; body: { 
 					<li>
 						<b>Direction:</b>{" "}
 						{props.rawSelected.direction === NetworkDirection.CLIENTBOUND
-							? "Server ->; Client"
+							? "Server -> Client"
 							: "Client -> Server"}
 					</li>
 				</ul>
