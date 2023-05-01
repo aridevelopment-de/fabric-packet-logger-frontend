@@ -1,8 +1,10 @@
 .canvas__wrapper {
   display: grid;
   place-items: center;
+  width: 100%;
+  height: calc(256px + 4rem);
 }
 
 .canvas__wrapper > canvas {
-  transform: scale(2) translateY(50%);
+  transform: scale(2);
 }

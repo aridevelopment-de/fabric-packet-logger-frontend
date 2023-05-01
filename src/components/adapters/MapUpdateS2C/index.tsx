@@ -1,13 +1,20 @@
 import styles from "./styles.module.css"
 import { useEffect, useRef } from "react";
 import { Text } from "@mantine/core"
+import { ICON_COORDS_MAPPING, ICON_HEIGHT, ICON_WIDTH, Icons, MAP_URL } from './assetfetcher';
 
 
 interface MapUpdateData {
 	mapId: number;
 	scale: number;
 	isLocked: boolean;
-	icons: Array<Object>;
+	icons: Array<{
+    type: number;
+    x: number;
+    z: number;
+    rotation: number;
+    hasDisplayName: boolean;
+  }>;
 	updateData: {
 		x: number;
 		z: number;
@@ -44,8 +51,31 @@ const MapUpdateS2CAdapter = (props: {data: {[key: string]: any} | null}) => {
   if (props.data === null) return null;
 
   const packetData = props.data as MapUpdateData;
-  if (packetData.updateData.data === undefined) {
+  console.log(packetData);
+  if (packetData.updateData === undefined || packetData.updateData.data === undefined) {
     return <Text color="dimmed">No map data available.</Text>
+  }
+
+  const drawIcon = (ctx: any, canvas: any, icon: MapUpdateData['icons'][0]) => {
+    // @ts-ignore
+    const [_rx, _ry] = ICON_COORDS_MAPPING[icon.type];
+    const [textureOffX, textureOffY] = [_rx * ICON_WIDTH, _ry * ICON_WIDTH];
+
+    const iconImage = new Image();
+    iconImage.src = MAP_URL;
+
+    // map x from -128, 127 to 0, 127
+    const imX = (icon.x + 128) / 2 - ICON_WIDTH / 2;
+    const imZ = (icon.z + 128) / 2 - ICON_HEIGHT / 2;
+
+    iconImage.onload = () => {
+      ctx.save();
+      ctx.translate(imX, imZ);
+      ctx.rotate(icon.rotation * 22.5);
+      ctx.translate(-ICON_WIDTH / 2, -ICON_HEIGHT / 2);
+      ctx.drawImage(iconImage, textureOffX, textureOffY, ICON_WIDTH, ICON_WIDTH, 0, 0, ICON_WIDTH, ICON_WIDTH);
+      ctx.restore();
+    }
   }
 
   const draw = (ctx: any, canvas: any) => {
@@ -75,6 +105,11 @@ const MapUpdateS2CAdapter = (props: {data: {[key: string]: any} | null}) => {
   
       const imageData = new ImageData(colorArray, packetData.updateData.columns, packetData.updateData.rows);
       ctx.putImageData(imageData, packetData.updateData.x, packetData.updateData.z);
+
+      // now rendering of the icons
+      packetData.icons.forEach((icon) => {
+        drawIcon(ctx, canvas, icon);
+      });
     })();
 	};
 
