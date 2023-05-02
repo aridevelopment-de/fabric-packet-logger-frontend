@@ -24,6 +24,20 @@ export interface Metadata {
     login: {
       [key: string]: PacketMetadata;
     },
+  },
+  serverbound: {
+    play: {
+      [key: string]: PacketMetadata;
+    },
+    status: {
+      [key: string]: PacketMetadata;
+    },
+    login: {
+      [key: string]: PacketMetadata;
+    },
+    handshaking: {
+      [key: string]: PacketMetadata;
+    },
   }
 }
 

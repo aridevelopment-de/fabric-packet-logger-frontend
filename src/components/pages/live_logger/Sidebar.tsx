@@ -42,7 +42,7 @@ const Sidebar = (props: { onReconnect: () => void }) => {
 		const meta: Metadata | null = await metadataManager.getMetadata();
 		if (meta === null) return [];
 
-		// for now we only care about clientbound packets
+		// cbound
 		const clientbound = meta.clientbound;
 		const returnable: { value: string, label: string }[] = [];
 
@@ -54,6 +54,21 @@ const Sidebar = (props: { onReconnect: () => void }) => {
 				returnable.push({
 					value: `cbound-${category}-${packetId}`,
 					label: name + " (S2C)"
+				});
+			}
+		}
+
+		// sbound
+		const serverbound = meta.serverbound;
+
+		for (let category in serverbound) {
+			for (let packetId in serverbound[category as keyof typeof serverbound]) {
+				const packet = serverbound[category as keyof typeof serverbound][packetId];
+				const name = packet.name;
+
+				returnable.push({
+					value: `sbound-${category}-${packetId}`,
+					label: name + " (C2S)"
 				});
 			}
 		}

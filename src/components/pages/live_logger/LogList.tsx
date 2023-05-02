@@ -94,10 +94,9 @@ export const LogLine = (props: {
 		let packetMeta = null;
 
 		try {
-			// TODO: Atm we assume the packet is clientbound as serverbound packets are not yet supported
 			packetMeta =
 				// @ts-ignore
-				meta.clientbound[NetworkStateNames[props.data.networkState]][
+				meta[props.data.direction === NetworkDirection.CLIENTBOUND ? "clientbound" : "serverbound"][NetworkStateNames[props.data.networkState]][
 					"0x" + props.data.id.toString(16).padStart(2, "0")
 				];
 		} catch (e) {

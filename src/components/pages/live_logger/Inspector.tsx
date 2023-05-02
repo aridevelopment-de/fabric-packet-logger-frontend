@@ -29,10 +29,9 @@ const Inspector = (props: { rawSelected: IRawPacket | null | undefined; body: { 
 			let packetMeta = null;
 
 			try {
-				// TODO: Atm we assume the packet is clientbound as serverbound packets are not yet supported
 				packetMeta =
 					// @ts-ignore
-					meta.clientbound[NetworkStateNames[props.rawSelected.networkState]][
+					meta[props.rawSelected.direction === NetworkDirection.CLIENTBOUND ? "clientbound" : "serverbound"][NetworkStateNames[props.rawSelected.networkState]][
 						// @ts-ignore
 						"0x" + props.rawSelected.id.toString(16).padStart(2, "0")
 					];
