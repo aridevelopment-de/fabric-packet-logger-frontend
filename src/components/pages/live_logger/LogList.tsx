@@ -8,6 +8,7 @@ import { useSession, useSettings } from "../../hooks/useSettings";
 import { PacketMetadata, metadataManager } from "../../../utils/metadatamanager";
 import { capitalize } from "../../../utils/stringutils";
 import { useAsyncMemo } from "../../hooks/useAsyncMemo";
+import { ArrowBigDownLine, ArrowBigUpLine } from "tabler-icons-react";
 
 const LogList = (props: {
 	data: IRawPacket[];
@@ -15,10 +16,11 @@ const LogList = (props: {
 	onLogClick: (index: number) => void;
 }) => {
 	const [selectedPacket] = useSession((state) => [state.selectedPacket]);
-	const [autoScroll, whitelist, blacklist] = useSettings((state) => [
+	const [autoScroll, whitelist, blacklist, autoRightAlign] = useSettings((state) => [
 		state.autoScroll,
 		state.whitelistedPackets,
 		state.blacklistedPackets,
+		state.loglistClientboundRightAligned
 	]);
 	const ref = useRef<HTMLDivElement>();
 
@@ -54,6 +56,7 @@ const LogList = (props: {
 						onClick={() => {
 							props.onLogClick(index);
 						}}
+						autoRightAlign={autoRightAlign}
 						body={index === selectedPacket ? props.selectedPacketBody : null}
 					/>
 				);
@@ -86,6 +89,7 @@ export const LogLine = (props: {
 	selected: boolean;
 	onClick: Function;
 	body: { [key: string]: any } | null;
+	autoRightAlign: boolean;
 }) => {
 	const stringifiedData = useMemo(() => JSON.stringify(props.body, null, 2), [props.body]);
 	const metadata: PacketMetadata | null = useAsyncMemo(async () => {
@@ -111,24 +115,22 @@ export const LogLine = (props: {
 
 	return (
 		<div className={styles.line} onClick={() => props.onClick()}>
-			<div className={styles.timestamp}>{new Date(props.data.timestamp).toLocaleTimeString()}</div>
-			<div className={styles.packet_name}>
-				{metadata.name}{" "}
-				<span className={styles.legacy_packet_name}>
-					(
-					{capitalize(NetworkStateNames[props.data.networkState]) +
-						" 0x" +
-						props.data.id.toString(16).padStart(2, "0")}
-					)
-				</span>
-			</div>
-
-			{props.selected && props.body === null && (
-				<div className={styles.expanded}>
-					<Loader variant="dots" />
+			<div className={`${styles.header} ${props.autoRightAlign ? styles.auto_right_align : ''} ${props.data.direction === NetworkDirection.CLIENTBOUND ? styles.clientbound : ''}`}>
+				<div className={styles.direction}>
+					{props.data.direction === NetworkDirection.CLIENTBOUND ? <ArrowBigDownLine size="15" /> : <ArrowBigUpLine size="15" />}
 				</div>
-			)}
-
+				<div className={styles.timestamp}>{new Date(props.data.timestamp).toLocaleTimeString()}</div>
+				<div className={styles.packet_name}>
+					{metadata.name}{" "}
+					<span className={styles.legacy_packet_name}>
+						(
+						{capitalize(NetworkStateNames[props.data.networkState]) +
+							" 0x" +
+							props.data.id.toString(16).padStart(2, "0")}
+						)
+					</span>
+				</div>
+			</div>
 			{props.selected && props.body !== null && (
 				<div className={styles.expanded}>
 					{stringifiedData.length < 1000 ? (
@@ -141,7 +143,7 @@ export const LogLine = (props: {
 				</div>
 			)}
 		</div>
-	);
+	)
 };
 
 export default LogList;

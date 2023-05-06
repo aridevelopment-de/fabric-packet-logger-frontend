@@ -46,6 +46,7 @@ const Analyzer = () => {
                     networkState: item.networkState,
                     direction: item.direction,
                   }}
+                  autoRightAlign={false} /* TODO: Temporary fix, move to settings page in future */
 									selected={selectedPacket !== null && item.index === selectedPacket.index}
 									onClick={async () => {
                     const record = await analyzerDb.getRecord(item.index!);

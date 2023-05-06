@@ -2,7 +2,6 @@ import ReconnectingWebSocket from "reconnecting-websocket";
 import { create } from "zustand";
 import { createJSONStorage, devtools, persist } from "zustand/middleware";
 
-// TODO: Use react router dom
 export enum CurrentPage {
   LIVE_LOGGER = "Live Logger",
   ANALYZER = "Analyzer",
@@ -23,11 +22,13 @@ export interface SettingsState {
   blacklistedPackets: string[];
   autoScroll: boolean;
   onlySaveFiltered: boolean;
+  loglistClientboundRightAligned: boolean;
 
   setWhitelistedPackets: (packets: string[]) => void;
   setBlacklistedPackets: (packets: string[]) => void;
   setAutoScroll: (autoScroll: boolean) => void;
   setOnlySaveFiltered: (onlySaveFiltered: boolean) => void;
+  setLoglistClientboundRightAligned: (loglistClientboundRightAligned: boolean) => void;
 }
 
 export interface SessionState {
@@ -52,10 +53,12 @@ export const useSettings = create<SettingsState>()(
         blacklistedPackets: [],
         autoScroll: true,
         onlySaveFiltered: false,
+        loglistClientboundRightAligned: false,
         setWhitelistedPackets: (packets) => set({ whitelistedPackets: packets }),
         setBlacklistedPackets: (packets) => set({ blacklistedPackets: packets }),
         setAutoScroll: (autoScroll) => set({ autoScroll }),
         setOnlySaveFiltered: (onlySaveFiltered) => set({ onlySaveFiltered }),
+        setLoglistClientboundRightAligned: (loglistClientboundRightAligned) => set({ loglistClientboundRightAligned }),
       }),
       {
         name: 'settings-storage',

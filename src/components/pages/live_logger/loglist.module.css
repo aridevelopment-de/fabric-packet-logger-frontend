@@ -8,11 +8,9 @@
 }
 
 .line {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-  grid-template-rows: 1fr;
+  display: flex;
+  flex-direction: column;
   padding: 0.5rem;
-  gap: 1em;
   user-select: none;
   cursor: pointer;
 }
@@ -21,18 +19,58 @@
   background-color: rgba(255, 255, 255, 0.05);
 }
 
-.timestamp {
+.header {
+  --line-color: var(--color-green);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.header.clientbound {
+  --line-color: var(--color-orange);
+}
+
+.header.auto_right_align.clientbound {
+  flex-direction: row-reverse;
+}
+
+.header > * {
+  margin-right: 0.5rem;
+}
+
+.header > .direction {
+  margin-right: 0.3rem;
+  color: var(--line-color);
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.header > .timestamp {
+  min-width: 100px;
   text-align: center;
-  color: var(--color-green);
+  color: var(--line-color);
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.legacy_packet_name {
+.header > .packet_name {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: row;
+  gap: 0.3rem;
+}
+
+.header.auto_right_align.clientbound > .packet_name {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.header > .packet_name > .legacy_packet_name {
   opacity: 0.7;
 }
 
 .expanded {
-  grid-column: span 2;
+  grid-column: span 3;
   width: 100%;
   max-height: 70vh;
   display: flex;

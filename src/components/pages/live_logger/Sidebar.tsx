@@ -13,19 +13,23 @@ const Sidebar = (props: { onReconnect: () => void }) => {
 		blacklist,
 		autoScroll,
 		onlySaveFiltered,
+		autoRightAlign,
 		setWhitelist,
 		setBlacklist,
 		setAutoScroll,
 		setOnlySaveFiltered,
+		setAutoRightAlign,
 	] = useSettings((state) => [
 		state.whitelistedPackets,
 		state.blacklistedPackets,
 		state.autoScroll,
 		state.onlySaveFiltered,
+		state.loglistClientboundRightAligned,
 		state.setWhitelistedPackets,
 		state.setBlacklistedPackets,
 		state.setAutoScroll,
 		state.setOnlySaveFiltered,
+		state.setLoglistClientboundRightAligned,
 	]);
 
 	const [ws, connected, logState, setLogState, setSelectedPacket] = useSession((state) => [
@@ -162,6 +166,11 @@ const Sidebar = (props: { onReconnect: () => void }) => {
 					onChange={(e) => setOnlySaveFiltered(e.currentTarget.checked)}
 					checked={onlySaveFiltered}
 					label="Only save filtered packets"
+				/>
+				<Checkbox
+					onChange={(e) => setAutoRightAlign(e.currentTarget.checked)}
+					checked={autoRightAlign}
+					label="Auto-align clientbound packets"
 				/>
 			</div>
 		</div>
