@@ -90,17 +90,15 @@ class MetadataManager {
       return false;
     }
 
-    this.updateLocalstorage(data.hash, metadata.data);
-    this.metadata = metadata.data;
+    this.metadata = metadata.data as Metadata;
+    this.updateLocalstorage(data.hash, this.metadata);
     return true;
   }
 
   public async getMetadata(): Promise<Metadata | null> {
-    // TODO: Make promise
     if (this.metadata === null) {
       console.info("Metadata is not loaded yet. Trying to load metadata...");
       await this.fetchMetadata();
-      return null;
     }
 
     return this.metadata;
