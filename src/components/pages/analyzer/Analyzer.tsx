@@ -9,7 +9,7 @@ import { IRawPacket } from "../../types";
 import { useState } from "react";
 
 
-const Analyzer = () => {
+const Analyzer = (props: {clientVersion: string}) => {
 	const [hasLog, selectedPacket, frontendView, setSelectedPacket] = useAnalyzerData((state) => [
 		state.hasLog,
 		state.selectedPacket,
@@ -39,6 +39,7 @@ const Analyzer = () => {
 							return (
 								<LogLine
                   key={item.index}
+                  clientVersion={props.clientVersion}
 									data={{
                     id: item.id,
                     timestamp: item.timestamp,
@@ -74,6 +75,7 @@ const Analyzer = () => {
 						})}
 					</div>
 					<Inspector
+            clientVersion={props.clientVersion}
             rawSelected={selectedPacket as any as IRawPacket}
             body={selectedPacket === null ? null : selectedPacket.data}
           />

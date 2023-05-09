@@ -4,6 +4,7 @@ import Navigation from "./components/navigation/Navigation";
 import LiveLogger from "./components/pages/live_logger/LiveLogger";
 import Analyzer from './components/pages/analyzer/Analyzer';
 import WebsocketHandler from "./WebsocketHandler";
+import React from "react";
 
 const SoonComponent = () => {
 	return (
@@ -14,8 +15,8 @@ const SoonComponent = () => {
 }
 
 const PAGE_TO_COMPONENT = {
-	[CurrentPage.LIVE_LOGGER]: <LiveLogger data={[]} />,
-  [CurrentPage.ANALYZER]: <Analyzer />,
+	[CurrentPage.LIVE_LOGGER]: <LiveLogger clientVersion="1.19.4" data={[]} />,
+  [CurrentPage.ANALYZER]: <Analyzer clientVersion="1.19.4" />,
   [CurrentPage.INTERCEPTOR]: <SoonComponent />,
   [CurrentPage.SEQUENCER]: <SoonComponent />,
   [CurrentPage.COMPARER]: <SoonComponent />,
@@ -23,14 +24,14 @@ const PAGE_TO_COMPONENT = {
   [CurrentPage.SETTINGS]: <SoonComponent />
 } as { [key in CurrentPage]: JSX.Element };
 
-const CustomRouter = () => {
+const CustomRouter = (props: {clientVersion: string}) => {
 	const page = useSession((state) => state.page);
 
 	return (
     <>
       <Navigation />
 			<WebsocketHandler>
-				{PAGE_TO_COMPONENT[page]}
+				{React.cloneElement(PAGE_TO_COMPONENT[page], {clientVersion: props.clientVersion})}
 			</WebsocketHandler>
     </>
 	);

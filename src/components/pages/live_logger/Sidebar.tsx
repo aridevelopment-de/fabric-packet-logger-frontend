@@ -7,7 +7,7 @@ import { LogState, useSession, useSettings } from "../../hooks/useSettings";
 import { PacketId } from "../../types";
 import styles from "./sidebar.module.css";
 
-const Sidebar = (props: { onReconnect: () => void }) => {
+const Sidebar = (props: { onReconnect: () => void, clientVersion: string }) => {
 	const [
 		whitelist,
 		blacklist,
@@ -43,7 +43,7 @@ const Sidebar = (props: { onReconnect: () => void }) => {
 	const initialWhiteBlackListData = useAsyncMemo(async () => {
 		// { value: 'react', label: 'React' },
 		// { value: 'play-0x4E', label: 'SetCenterChunk' }
-		const meta: Metadata | null = await metadataManager.getMetadata();
+		const meta: Metadata | null = await metadataManager.getMetadata(props.clientVersion);
 		if (meta === null) return [];
 
 		// cbound

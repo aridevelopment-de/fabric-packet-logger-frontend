@@ -18,13 +18,13 @@ const COLORS = {
 	function: "rgb(200, 200, 200)",
 };
 
-const Inspector = (props: { rawSelected: IRawPacket | null | undefined; body: { [key: string]: any } | null }) => {
+const Inspector = (props: { rawSelected: IRawPacket | null | undefined; body: { [key: string]: any } | null, clientVersion: string }) => {
 	const [metadata, setMetadata] = useState<PacketMetadata | null>(null);
 
 	useEffect(() => {
 		if (props.rawSelected === undefined || props.rawSelected === null) return;
-
-		metadataManager.getMetadata().then((meta: Metadata | null) => {
+		
+		metadataManager.getMetadata(props.clientVersion).then((meta: Metadata | null) => {
 			if (meta === null) return;
 			let packetMeta = null;
 

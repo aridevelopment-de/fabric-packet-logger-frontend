@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const HOST_URL = "https://raw.githubusercontent.com/aridevelopment-de/fabric-packet-logger-metadata/main/";
+const HOST_URL = "https://raw.githubusercontent.com/aridevelopment-de/fabric-packet-logger-metadata/{version}/";
 const INDEX_FILE = HOST_URL + "index.json";
 
 export interface PacketMetadata {
@@ -56,8 +56,8 @@ class MetadataManager {
     localStorage.setItem(this.LS_METADATA_KEY, JSON.stringify(metadata));
   }
 
-  private async isCacheOutdated(): Promise<{isOutdated: false} | {isOutdated: true, location: string, hash: string}> {
-    const index = await axios.get(INDEX_FILE, { validateStatus: () => true });
+  private async isCacheOutdated(version: string): Promise<{isOutdated: false} | {isOutdated: true, location: string, hash: string}> {
+    const index = await axios.get(INDEX_FILE.replace("{version}", version), { validateStatus: () => true });
 
     if (index.status !== 200) {
       console.error("Failed to fetch metadata index. Status: " + index.status);
@@ -71,11 +71,11 @@ class MetadataManager {
       return { isOutdated: false };
     }
 
-    return { isOutdated: true, location: HOST_URL + index.data.filename, hash: index.data.hash };
+    return { isOutdated: true, location: HOST_URL.replace("{version}", version) + index.data.filename, hash: index.data.hash };
   }
 
-  public async fetchMetadata(): Promise<boolean> {
-    const data = await this.isCacheOutdated();
+  public async fetchMetadata(version: string): Promise<boolean> {
+    const data = await this.isCacheOutdated(version);
 
     if (!data.isOutdated) {
       this.metadata = JSON.parse(localStorage.getItem(this.LS_METADATA_KEY) || "{}") as Metadata;
@@ -95,10 +95,10 @@ class MetadataManager {
     return true;
   }
 
-  public async getMetadata(): Promise<Metadata | null> {
+  public async getMetadata(version: string): Promise<Metadata | null> {
     if (this.metadata === null) {
       console.info("Metadata is not loaded yet. Trying to load metadata...");
-      await this.fetchMetadata();
+      await this.fetchMetadata(version);
     }
 
     return this.metadata;

@@ -6,7 +6,7 @@ import Inspector from "./Inspector";
 import LogList from "./LogList";
 import Sidebar from "./Sidebar";
 
-function LiveLogger(props: { data: IRawPacket[] }) {
+function LiveLogger(props: { data: IRawPacket[], clientVersion: string }) {
 	const [ws, selectedPacketId, setSelectedPacketId, setLogState] = useSession((state) => [state.ws, state.selectedPacket, state.setSelectedPacket, state.setLogState]);
 	const [selectedPacket, setSelectedPacket] = useState<{[key: string]: any} | null>(null);
 	const [cachedPackets, setCachedPackets] = useState<
@@ -62,8 +62,9 @@ function LiveLogger(props: { data: IRawPacket[] }) {
 		>
 			<Sidebar
 				onReconnect={() => ws ? ws.reconnect() : void 0}
+				clientVersion={props.clientVersion}
 			/>
-			<LogList data={props.data} selectedPacketBody={selectedPacket} onLogClick={(index: number) => {
+			<LogList data={props.data} clientVersion={props.clientVersion} selectedPacketBody={selectedPacket} onLogClick={(index: number) => {
 				if (ws === null) return;
 				
 				if (index === selectedPacketId) {
@@ -86,7 +87,7 @@ function LiveLogger(props: { data: IRawPacket[] }) {
 					data: index
 				}));
 			}} />
-			<Inspector rawSelected={selectedPacketId === null ? null : props.data[selectedPacketId]} body={selectedPacket} />
+			<Inspector rawSelected={selectedPacketId === null ? null : props.data[selectedPacketId]} body={selectedPacket} clientVersion={props.clientVersion} />
 		</div>
 	);
 }

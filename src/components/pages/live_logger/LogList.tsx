@@ -12,6 +12,7 @@ import { ArrowBigDownLine, ArrowBigUpLine } from "tabler-icons-react";
 
 const LogList = (props: {
 	data: IRawPacket[];
+	clientVersion: string;
 	selectedPacketBody: { [key: string]: any } | null;
 	onLogClick: (index: number) => void;
 }) => {
@@ -52,6 +53,7 @@ const LogList = (props: {
 					<LogLine
 						key={index}
 						data={item}
+						clientVersion={props.clientVersion}
 						selected={index === selectedPacket}
 						onClick={() => {
 							props.onLogClick(index);
@@ -86,6 +88,7 @@ const LogList = (props: {
 
 export const LogLine = (props: {
 	data: IRawPacket;
+	clientVersion: string;
 	selected: boolean;
 	onClick: Function;
 	body: { [key: string]: any } | null;
@@ -93,7 +96,7 @@ export const LogLine = (props: {
 }) => {
 	const stringifiedData = useMemo(() => JSON.stringify(props.body, null, 2), [props.body]);
 	const metadata: PacketMetadata | null = useAsyncMemo(async () => {
-		const meta = await metadataManager.getMetadata();
+		const meta = await metadataManager.getMetadata(props.clientVersion);
 		if (meta === null) return null;
 		let packetMeta = null;
 

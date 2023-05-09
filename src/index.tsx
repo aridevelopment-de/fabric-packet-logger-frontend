@@ -8,7 +8,10 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { metadataManager } from './utils/metadatamanager';
 
-metadataManager.fetchMetadata();
+
+const clientVersion = new URLSearchParams(document.location.search).get("version") || "1.19.4";
+metadataManager.fetchMetadata(clientVersion);
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
@@ -17,7 +20,7 @@ root.render(
     <MantineProvider withNormalizeCSS theme={{ colorScheme: "dark" }}>
       <Notifications />
       <ModalsProvider>
-        <CustomRouter />
+        <CustomRouter clientVersion={clientVersion} />
       </ModalsProvider>
     </MantineProvider>
   </React.StrictMode>
