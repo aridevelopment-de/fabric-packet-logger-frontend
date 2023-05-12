@@ -11,6 +11,12 @@
   margin-bottom: 2em;
 }
 
+.title__wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
 .title {
   display: block;
   font-size: 1.4em;
@@ -18,11 +24,24 @@
   color: white;
   margin-bottom: 0.5em;
   font-family: "Jetbrains Mono", sans-serif;
+  width: fit-content;
+  max-width: 40ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .title:hover {
   text-decoration: underline;
   color: aquamarine;
+}
+
+.close_icon {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.close_icon:hover {
+  opacity: 0.85;
 }
 
 .description {

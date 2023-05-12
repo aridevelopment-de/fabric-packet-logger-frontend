@@ -1,10 +1,11 @@
-import { Code, Table, Text } from "@mantine/core";
+import { ActionIcon, Code, Table, Text } from "@mantine/core";
 import { ADAPTERS } from "../../adapters/adapters";
 import { IRawPacket, NetworkDirection, NetworkStateNames } from "../../types";
 import styles from "./inspector.module.css";
 import { Metadata, PacketMetadata, metadataManager } from "../../../utils/metadatamanager";
 import { useState, useEffect } from "react";
 import React from "react";
+import { X } from "tabler-icons-react";
 
 const COLORS = {
 	key: "rgb(209, 154, 102)",
@@ -18,7 +19,7 @@ const COLORS = {
 	function: "rgb(200, 200, 200)",
 };
 
-const Inspector = (props: { rawSelected: IRawPacket | null | undefined; body: { [key: string]: any } | null, clientVersion: string }) => {
+const Inspector = (props: { rawSelected: IRawPacket | null | undefined; body: { [key: string]: any } | null, clientVersion: string, onClose: Function }) => {
 	const [metadata, setMetadata] = useState<PacketMetadata | null>(null);
 
 	useEffect(() => {
@@ -53,9 +54,14 @@ const Inspector = (props: { rawSelected: IRawPacket | null | undefined; body: { 
 	return (
 		<div className={styles.container}>
 			<header className={styles.header}>
-				<a className={styles.title} href={metadata.url}>
-					{metadata.name}
-				</a>
+				<div className={styles.title__wrapper}>
+					<a className={styles.title} href={metadata.url}>
+						{metadata.name}
+					</a>
+					<ActionIcon className={styles.close_icon} onClick={() => props.onClose()} variant="transparent">
+						<X />
+					</ActionIcon>
+				</div>
 				{(metadata.description ?? "No description available. Be the first to add one!")
 					.split("\n")
 					.map((line, idx) => (

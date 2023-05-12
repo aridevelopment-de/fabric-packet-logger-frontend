@@ -96,7 +96,10 @@ function LiveLogger(props: { data: IRawPacket[], clientVersion: string }) {
 					data: index
 				}));
 			}} />
-			<Inspector rawSelected={selectedPacketId === null ? null : props.data[selectedPacketId]} body={selectedPacket} clientVersion={props.clientVersion} />
+			<Inspector onClose={() => {
+				setSelectedPacketId(null);
+				setSelectedPacket(null);
+			}} rawSelected={selectedPacketId === null ? null : props.data[selectedPacketId]} body={selectedPacket} clientVersion={props.clientVersion} />
 		</div>
 	);
 }

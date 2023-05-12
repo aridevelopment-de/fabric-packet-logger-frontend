@@ -7,6 +7,7 @@ import { LogLine } from "../live_logger/LogList";
 import styles from "./analyzer.module.css";
 import { IRawPacket } from "../../types";
 import { useState } from "react";
+import { showNotification } from "@mantine/notifications";
 
 
 const Analyzer = (props: {clientVersion: string}) => {
@@ -53,7 +54,10 @@ const Analyzer = (props: {clientVersion: string}) => {
                     const record = await analyzerDb.getRecord(item.index!);
 
                     if (record === undefined) {
-                      // TODO: User feedback
+                      showNotification({
+                        title: "Error",
+                        message: "Record not found",
+                      })
                       throw new Error("Record not found");
                     }
 
@@ -78,6 +82,9 @@ const Analyzer = (props: {clientVersion: string}) => {
             clientVersion={props.clientVersion}
             rawSelected={selectedPacket as any as IRawPacket}
             body={selectedPacket === null ? null : selectedPacket.data}
+            onClose={() => {
+              setSelectedPacket(null);
+            }}
           />
 				</div>
 			)}
