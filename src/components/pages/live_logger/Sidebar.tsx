@@ -14,22 +14,26 @@ const Sidebar = (props: { onReconnect: () => void, clientVersion: string }) => {
 		autoScroll,
 		autoRightAlign,
 		applyWhiteBlack,
+		stackPackets,
 		setWhitelist,
 		setBlacklist,
 		setAutoScroll,
 		setAutoRightAlign,
 		setApplyWhiteBlack,
+		setPacketStacking,
 	] = useSettings((state) => [
 		state.whitelistedPackets,
 		state.blacklistedPackets,
 		state.autoScroll,
 		state.loglistClientboundRightAligned,
 		state.applyWhiteBlackListCurrent,
+		state.packetStacking,
 		state.setWhitelistedPackets,
 		state.setBlacklistedPackets,
 		state.setAutoScroll,
 		state.setLoglistClientboundRightAligned,
-		state.setApplyWhiteBlackListCurrent
+		state.setApplyWhiteBlackListCurrent,
+		state.setPacketStacking,
 	]);
 
 	const [ws, connected, logState, setLogState, setSelectedPacket] = useSession((state) => [
@@ -185,6 +189,11 @@ const Sidebar = (props: { onReconnect: () => void, clientVersion: string }) => {
 					onChange={(e) => setApplyWhiteBlack(e.currentTarget.checked)}
 					checked={applyWhiteBlack}
 					label="Apply white/blacklist to current data"
+				/>
+				<Checkbox
+					onChange={(e) => setPacketStacking(e.currentTarget.checked)}
+					checked={stackPackets}
+					label="Stack packets of same type"
 				/>
 				<Checkbox
 					onChange={(e) => setAutoScroll(e.currentTarget.checked)}

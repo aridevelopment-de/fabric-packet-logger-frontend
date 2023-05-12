@@ -74,6 +74,7 @@ const Analyzer = (props: {clientVersion: string}) => {
                     setSelectedPacket(record);
                   }}
                   body={selectedPacket === null ? null : selectedPacket.data}
+                  isChild={false}
 								/>
 							);
 						})}

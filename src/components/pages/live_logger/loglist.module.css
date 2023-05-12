@@ -3,31 +3,42 @@
   overflow-y: auto;
 }
 
-.line:not(:last-child) {
+.line:not(:last-child),
+.group:not(:last-child) {
   border-bottom: 1px solid #777;
 }
 
-.line {
+.line, .group {
   display: flex;
   flex-direction: column;
-  padding: 0.5rem;
   user-select: none;
   cursor: pointer;
+}
+
+.group .line {
+  padding-left: calc(0.5em + 15px + 1em); /* 0.5em padding at header + icon */
 }
 
 .line:hover {
   background-color: rgba(255, 255, 255, 0.05);
 }
 
+.group > .header:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
 .header {
   --line-color: var(--color-green);
+  --dark-line-color: var(--color-green-dark);
   display: flex;
   flex-direction: row;
+  padding: 0.5em;
   align-items: center;
 }
 
 .header.clientbound {
   --line-color: var(--color-orange);
+  --dark-line-color: var(--color-orange-dark);
 }
 
 .header.auto_right_align.clientbound {
@@ -51,6 +62,10 @@
   text-align: center;
   color: var(--line-color);
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.header > .timestamp_end {
+  color: var(--dark-line-color);
 }
 
 .header > .packet_name {

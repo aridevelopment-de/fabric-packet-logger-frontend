@@ -23,12 +23,14 @@ export interface SettingsState {
   autoScroll: boolean;
   loglistClientboundRightAligned: boolean;
   applyWhiteBlackListCurrent: boolean;
+  packetStacking: boolean;
 
   setWhitelistedPackets: (packets: string[]) => void;
   setBlacklistedPackets: (packets: string[]) => void;
   setAutoScroll: (autoScroll: boolean) => void;
   setLoglistClientboundRightAligned: (loglistClientboundRightAligned: boolean) => void;
   setApplyWhiteBlackListCurrent: (applyWhiteBlackListCurrent: boolean) => void;
+  setPacketStacking(packetStacking: boolean): void;
 }
 
 export interface SessionState {
@@ -54,11 +56,13 @@ export const useSettings = create<SettingsState>()(
         autoScroll: true,
         loglistClientboundRightAligned: false,
         applyWhiteBlackListCurrent: false,
+        packetStacking: true,
         setWhitelistedPackets: (packets) => set({ whitelistedPackets: packets }),
         setBlacklistedPackets: (packets) => set({ blacklistedPackets: packets }),
         setAutoScroll: (autoScroll) => set({ autoScroll }),
         setLoglistClientboundRightAligned: (loglistClientboundRightAligned) => set({ loglistClientboundRightAligned }),
         setApplyWhiteBlackListCurrent: (applyWhiteBlackListCurrent) => set({ applyWhiteBlackListCurrent }),
+        setPacketStacking: (packetStacking) => set({ packetStacking }),
       }),
       {
         name: 'packetlogger-settings-storage',
