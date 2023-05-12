@@ -10,23 +10,18 @@ The web-ui connects to the websocket server started by the client. A url paramet
 ## Features
 
 - List of packets
-  - Timestamp
-  - Wiki.vg name
-  - Internal Name (mappings still missing, sorry)
+  - Wiki.vg information on this packet and fields
+  - Internal Name
   - Packet Data highlighting
 - Packet Filter
-  - Whitelist
-  - Blacklist
 - Packet inspector
-  - URL to wiki.vg section
-  - Description of packet
-  - Description of each packet field
-  - wiki.vg note
-  - Meta information such as packet id, internal name (hopefully with mappings soon enough), direction, ...
+  - All of list of packets
   - Custom Adapters for certain packets (e.g. MapUpdateAdapter, see below)
 
 
 ## Previews
+
+*Previews may be outdated a bit*  
 
 Overview:
 ![https://cdn.discordapp.com/attachments/598256161212596235/1093634774763065475/image.png](https://cdn.discordapp.com/attachments/598256161212596235/1093634774763065475/image.png)
