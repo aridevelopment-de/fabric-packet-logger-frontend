@@ -4,7 +4,7 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import styles from "./loglist.module.css";
 import { IRawPacket, NetworkDirection, NetworkStateNames } from "../../types";
-import { useSession, useSettings } from "../../hooks/useSettings";
+import { CurrentPage, LogState, useSession, useSettings } from "../../hooks/useSettings";
 import { PacketMetadata, metadataManager } from "../../../utils/metadatamanager";
 import { capitalize } from "../../../utils/stringutils";
 import { useAsyncMemo } from "../../hooks/useAsyncMemo";
@@ -16,25 +16,26 @@ const LogList = (props: {
 	selectedPacketBody: { [key: string]: any } | null;
 	onLogClick: (index: number) => void;
 }) => {
-	const [selectedPacket] = useSession((state) => [state.selectedPacket]);
-	const [autoScroll, whitelist, blacklist, autoRightAlign] = useSettings((state) => [
+	const [selectedPacket, page, logState] = useSession((state) => [state.selectedPacket, state.page, state.logState]);
+	const [autoScroll, whitelist, blacklist, autoRightAlign, applyWhiteBlackList] = useSettings((state) => [
 		state.autoScroll,
 		state.whitelistedPackets,
 		state.blacklistedPackets,
-		state.loglistClientboundRightAligned
+		state.loglistClientboundRightAligned,
+		state.applyWhiteBlackListCurrent
 	]);
 	const ref = useRef<HTMLDivElement>();
 
 	useEffect(() => {
 		// initial auto scroll
-		if (autoScroll && ref.current) {
+		if (autoScroll && ref.current && logState === LogState.LOGGING) {
 			const element = ref.current;
 			element.scrollTop = element.scrollHeight;
 		}
-	}, [autoScroll, whitelist.length, blacklist.length]);
+	}, [autoScroll, whitelist.length, blacklist.length, logState]);
 
 	useEffect(() => {
-		if (autoScroll && selectedPacket === null && ref.current) {
+		if (autoScroll && selectedPacket === null && ref.current && logState === LogState.LOGGING) {
 			const element = ref.current;
 			// element.scrollTop = element.scrollHeight;
 			// smooth scrolling
@@ -43,7 +44,7 @@ const LogList = (props: {
 				behavior: "smooth",
 			});
 		}
-	}, [autoScroll, selectedPacket, props.data.length]);
+	}, [autoScroll, selectedPacket, props.data.length, logState]);
 
 	return (
 		// @ts-ignore
@@ -62,8 +63,17 @@ const LogList = (props: {
 						body={index === selectedPacket ? props.selectedPacketBody : null}
 					/>
 				);
-					
 				
+				// white/blacklist only applies to live logger
+				if (page !== CurrentPage.LIVE_LOGGER) {
+					return returnable;
+				}
+
+				// only apply white/blacklist to frontend if the user wants it
+				if (applyWhiteBlackList === false) {
+					return returnable;
+				}
+
 				const networkSide = item.direction === NetworkDirection.CLIENTBOUND ? "cbound" : "sbound";
 				const networkState = NetworkStateNames[item.networkState].toLowerCase();
 				const formattedId = `${networkSide}-${networkState}-0x${item.id.toString(16).padStart(2, "0")}`;

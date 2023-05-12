@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import EventHandler, { EventType } from "../../../utils/eventhandler";
-import { useSession } from "../../hooks/useSettings";
+import { useSession, useSettings } from "../../hooks/useSettings";
 import { IRawPacket, IWSSPacket, PacketId } from "../../types";
 import Inspector from "./Inspector";
 import LogList from "./LogList";
@@ -8,6 +8,7 @@ import Sidebar from "./Sidebar";
 
 function LiveLogger(props: { data: IRawPacket[], clientVersion: string }) {
 	const [ws, selectedPacketId, setSelectedPacketId, setLogState] = useSession((state) => [state.ws, state.selectedPacket, state.setSelectedPacket, state.setLogState]);
+	const [whitelist, blacklist, setWhitelist, setBlacklist] = useSettings((state) => [state.whitelistedPackets, state.blacklistedPackets, state.setWhitelistedPackets, state.setBlacklistedPackets]);
 	const [selectedPacket, setSelectedPacket] = useState<{[key: string]: any} | null>(null);
 	const [cachedPackets, setCachedPackets] = useState<
 		{ [key: string]: { [key: string]: any } }
@@ -26,9 +27,17 @@ function LiveLogger(props: { data: IRawPacket[], clientVersion: string }) {
 					...prev,
 					[packetData.data.index]: packetData.data.packetData,
 				}));
+			} else if (packetData.id === PacketId.WHITE_BLACK_LIST_CONFIRM) {
+				if (whitelist !== packetData.data.whitelist) {
+					setWhitelist(packetData.data.whitelist);
+				}
+
+				if (blacklist !== packetData.data.blacklist) {
+					setBlacklist(packetData.data.blacklist);
+				}
 			}
 		},
-		[setLogState, setSelectedPacketId]
+		[setLogState, setSelectedPacketId, whitelist, blacklist, setWhitelist, setBlacklist]
 	);
 
 	useEffect(() => {

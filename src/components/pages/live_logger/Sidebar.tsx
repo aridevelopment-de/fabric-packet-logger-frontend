@@ -12,24 +12,24 @@ const Sidebar = (props: { onReconnect: () => void, clientVersion: string }) => {
 		whitelist,
 		blacklist,
 		autoScroll,
-		onlySaveFiltered,
 		autoRightAlign,
+		applyWhiteBlack,
 		setWhitelist,
 		setBlacklist,
 		setAutoScroll,
-		setOnlySaveFiltered,
 		setAutoRightAlign,
+		setApplyWhiteBlack,
 	] = useSettings((state) => [
 		state.whitelistedPackets,
 		state.blacklistedPackets,
 		state.autoScroll,
-		state.onlySaveFiltered,
 		state.loglistClientboundRightAligned,
+		state.applyWhiteBlackListCurrent,
 		state.setWhitelistedPackets,
 		state.setBlacklistedPackets,
 		state.setAutoScroll,
-		state.setOnlySaveFiltered,
 		state.setLoglistClientboundRightAligned,
+		state.setApplyWhiteBlackListCurrent
 	]);
 
 	const [ws, connected, logState, setLogState, setSelectedPacket] = useSession((state) => [
@@ -125,7 +125,19 @@ const Sidebar = (props: { onReconnect: () => void, clientVersion: string }) => {
 				<MultiSelect
 					data={initialWhiteBlackListData ?? []}
 					value={whitelist}
-					onChange={setWhitelist}
+					onChange={(packets: string[]) => {
+						setWhitelist(packets);
+						
+						if (ws === null) return;
+
+						ws.send(JSON.stringify({
+							id: PacketId.WHITE_BLACK_LIST_CHANGE,
+							data: {
+								whitelist: packets,
+								blacklist: blacklist
+							}
+						}));
+					}}
 					clearable
 					searchable
 					placeholder="Pick all packets that you want to see"
@@ -137,7 +149,19 @@ const Sidebar = (props: { onReconnect: () => void, clientVersion: string }) => {
 				<MultiSelect
 					data={initialWhiteBlackListData ?? []}
 					value={blacklist}
-					onChange={setBlacklist}
+					onChange={(packets: string[]) => {
+						setBlacklist(packets);
+						
+						if (ws === null) return;
+
+						ws.send(JSON.stringify({
+							id: PacketId.WHITE_BLACK_LIST_CHANGE,
+							data: {
+								whitelist: whitelist,
+								blacklist: packets
+							}
+						}));
+					}}
 					clearable
 					searchable
 					placeholder="Pick all packets that you don't want to see"
@@ -158,14 +182,14 @@ const Sidebar = (props: { onReconnect: () => void, clientVersion: string }) => {
 					}))
 				}}>Export</Button>
 				<Checkbox
+					onChange={(e) => setApplyWhiteBlack(e.currentTarget.checked)}
+					checked={applyWhiteBlack}
+					label="Apply white/blacklist to current data"
+				/>
+				<Checkbox
 					onChange={(e) => setAutoScroll(e.currentTarget.checked)}
 					checked={autoScroll}
 					label="Autoscroll"
-				/>
-				<Checkbox
-					onChange={(e) => setOnlySaveFiltered(e.currentTarget.checked)}
-					checked={onlySaveFiltered}
-					label="Only save filtered packets"
 				/>
 				<Checkbox
 					onChange={(e) => setAutoRightAlign(e.currentTarget.checked)}

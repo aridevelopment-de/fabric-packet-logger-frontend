@@ -21,14 +21,14 @@ export interface SettingsState {
   whitelistedPackets: string[];
   blacklistedPackets: string[];
   autoScroll: boolean;
-  onlySaveFiltered: boolean;
   loglistClientboundRightAligned: boolean;
+  applyWhiteBlackListCurrent: boolean;
 
   setWhitelistedPackets: (packets: string[]) => void;
   setBlacklistedPackets: (packets: string[]) => void;
   setAutoScroll: (autoScroll: boolean) => void;
-  setOnlySaveFiltered: (onlySaveFiltered: boolean) => void;
   setLoglistClientboundRightAligned: (loglistClientboundRightAligned: boolean) => void;
+  setApplyWhiteBlackListCurrent: (applyWhiteBlackListCurrent: boolean) => void;
 }
 
 export interface SessionState {
@@ -52,16 +52,16 @@ export const useSettings = create<SettingsState>()(
         whitelistedPackets: [],
         blacklistedPackets: [],
         autoScroll: true,
-        onlySaveFiltered: false,
         loglistClientboundRightAligned: false,
+        applyWhiteBlackListCurrent: false,
         setWhitelistedPackets: (packets) => set({ whitelistedPackets: packets }),
         setBlacklistedPackets: (packets) => set({ blacklistedPackets: packets }),
         setAutoScroll: (autoScroll) => set({ autoScroll }),
-        setOnlySaveFiltered: (onlySaveFiltered) => set({ onlySaveFiltered }),
         setLoglistClientboundRightAligned: (loglistClientboundRightAligned) => set({ loglistClientboundRightAligned }),
+        setApplyWhiteBlackListCurrent: (applyWhiteBlackListCurrent) => set({ applyWhiteBlackListCurrent }),
       }),
       {
-        name: 'settings-storage',
+        name: 'packetlogger-settings-storage',
         storage: createJSONStorage(() => localStorage),
       }
     )

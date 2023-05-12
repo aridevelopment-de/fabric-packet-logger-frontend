@@ -8,6 +8,17 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { metadataManager } from './utils/metadatamanager';
 
+// Fix for dev environment
+if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+  window.onerror = (...args) => {
+    if (args[0] === "ResizeObserver loop limit exceeded" || args[0] === "ResizeObserver loop completed with undelivered notifications.") {
+      return true;
+    } else {
+      console.error(...args);
+      return false;
+    }
+  }
+}
 
 const clientVersion = new URLSearchParams(document.location.search).get("version") || "1.19.4";
 metadataManager.fetchMetadata(clientVersion);

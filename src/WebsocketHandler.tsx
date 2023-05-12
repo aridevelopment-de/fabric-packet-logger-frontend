@@ -23,59 +23,21 @@ const WebsocketHandler = (props: { children: JSX.Element }) => {
 		state.setWs,
 		state.setConnected,
 	]);
-  const [whitelistData, blacklistData, onlySaveFiltered] = useSettings((state: SettingsState) => [
-    state.whitelistedPackets,
-    state.blacklistedPackets,
-    state.onlySaveFiltered,
-  ]);
+  const [whitelist, blacklist] = useSettings((state) => [state.whitelistedPackets, state.blacklistedPackets]);
 
   const onMessage = useCallback((event: MessageEvent) => {
     const packetData: IWSSPacket = JSON.parse(event.data);
 
     if (packetData.id === PacketId.MC_PACKET_RECEIVED) {
       // [packet id, unix milli-timestamp, unique index, networkstate, direction]
-      if (!onlySaveFiltered) {
-        setData((d) => [
-          ...d,
-          ...distributeRawPacket(packetData.data),
-        ]);
+      setData((d) => [
+        ...d,
+        ...distributeRawPacket(packetData.data),
+      ]);
 
-        return;
-      } else {
-        let packetsToAdd: Array<number>[] = [];
-
-        for (let rawPacket of packetData.data) {
-          let shallAdd = true;
-          const packetId = rawPacket[0];
-          const networkSide = rawPacket[4] === NetworkDirection.CLIENTBOUND ? "cbound" : "sbound";
-          const networkState = NetworkStateNames[rawPacket[3]];
-          const formattedId = `${networkSide}-${networkState}-0x${packetId.toString(16).padStart(2, "0")}`;
-
-          if (whitelistData.length > 0) {
-            if (!whitelistData.includes(formattedId)) {
-              shallAdd = false;
-            }
-          }
-
-          if (blacklistData.length > 0) {
-            if (blacklistData.includes(formattedId)) {
-              shallAdd = false;
-            }
-          }
-
-          if (shallAdd) {
-            packetsToAdd.push(rawPacket);
-          }
-        }
-
-        if (packetsToAdd.length === 0) return;
-        setData((d) => [
-          ...d,
-          ...distributeRawPacket(packetsToAdd),
-        ]);
-      }
+      return;
     }
-  }, [onlySaveFiltered, whitelistData, blacklistData]);
+  }, []);
 
   useEffect(() => {
 		if (ws) {
@@ -86,14 +48,37 @@ const WebsocketHandler = (props: { children: JSX.Element }) => {
 		}
 	}, [ws, onMessage]);
 
+  const sendWhiteBlackList = useCallback(() => {
+    ws!.send(JSON.stringify({
+      id: PacketId.WHITE_BLACK_LIST_CHANGE,
+      data: {
+        whitelist,
+        blacklist
+      }
+    }));
+  }, [ws, whitelist, blacklist]);
+
+  useEffect(() => {
+    // whitelist / blacklist
+    if (ws !== null) {
+      ws.addEventListener("open", sendWhiteBlackList);
+    }
+
+    return () => {
+      if (ws !== null) {
+        ws.removeEventListener("open", sendWhiteBlackList);
+      }
+    }
+  }, [ws, sendWhiteBlackList]);
+
   useEffect(() => {
     const port = new URLSearchParams(document.location.search).get("wssPort") || "1337";
     const ws = new ReconnectingWebSocket("ws://localhost:" + port);
+    setWs(ws);
 
     ws.onopen = () => {
       console.info("Connected to server");
       setConnected(true);
-      setWs(ws);
     }
 
     ws.onclose = () => {
