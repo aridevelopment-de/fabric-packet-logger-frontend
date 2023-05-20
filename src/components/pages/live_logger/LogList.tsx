@@ -76,7 +76,7 @@ const LogList = (props: {
 
 				const networkSide = item.direction === NetworkDirection.CLIENTBOUND ? "cbound" : "sbound";
 				const networkState = NetworkStateNames[item.networkState].toLowerCase();
-				const formattedId = `${networkSide}-${networkState}-0x${item.id.toString(16).padStart(2, "0")}`;
+				const formattedId = `${networkSide}-${networkState}-0x${item.id.toString(16).toUpperCase().padStart(2, "0")}`;
 
 				if (whitelist.length > 0) {
 					if (!whitelist.includes(formattedId)) {
@@ -105,6 +105,8 @@ export const LogLine = (props: {
 	autoRightAlign: boolean;
 }) => {
 	const stringifiedData = useMemo(() => JSON.stringify(props.body, null, 2), [props.body]);
+	const formattedPacketId = useMemo(() => "0x" + props.data.id.toString(16).toUpperCase().padStart(2, "0"), [props.data.id]);
+
 	const metadata: PacketMetadata | null = useAsyncMemo(async () => {
 		const meta = await metadataManager.getMetadata(props.clientVersion);
 		if (meta === null) return null;
@@ -113,9 +115,7 @@ export const LogLine = (props: {
 		try {
 			packetMeta =
 				// @ts-ignore
-				meta[props.data.direction === NetworkDirection.CLIENTBOUND ? "clientbound" : "serverbound"][NetworkStateNames[props.data.networkState]][
-					"0x" + props.data.id.toString(16).padStart(2, "0")
-				];
+				meta[props.data.direction === NetworkDirection.CLIENTBOUND ? "clientbound" : "serverbound"][NetworkStateNames[props.data.networkState]][formattedPacketId];
 		} catch (e) {
 			console.error(e);
 			return null;
@@ -137,9 +137,7 @@ export const LogLine = (props: {
 					{metadata.name}{" "}
 					<span className={styles.legacy_packet_name}>
 						(
-						{capitalize(NetworkStateNames[props.data.networkState]) +
-							" 0x" +
-							props.data.id.toString(16).padStart(2, "0")}
+						{capitalize(NetworkStateNames[props.data.networkState]) + " " + formattedPacketId}
 						)
 					</span>
 				</div>

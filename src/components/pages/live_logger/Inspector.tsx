@@ -34,7 +34,7 @@ const Inspector = (props: { rawSelected: IRawPacket | null | undefined; body: { 
 					// @ts-ignore
 					meta[props.rawSelected.direction === NetworkDirection.CLIENTBOUND ? "clientbound" : "serverbound"][NetworkStateNames[props.rawSelected.networkState]][
 						// @ts-ignore
-						"0x" + props.rawSelected.id.toString(16).padStart(2, "0")
+						"0x" + props.rawSelected.id.toString(16).toUpperCase().padStart(2, "0")
 					];
 			} catch (e) {
 				console.error(e);
@@ -45,11 +45,23 @@ const Inspector = (props: { rawSelected: IRawPacket | null | undefined; body: { 
 		});
 	}, [props]);
 
+	if (metadata === undefined) {
+		console.error(`
+Inspector.tsx: metadata is undefined.
+This is a bug, please report it to the developer.
+Props:
+${JSON.stringify(props)}
+		`);
+
+		return null;
+	}
+
+
 	if (props.rawSelected === undefined || props.rawSelected === null || metadata === null || props.body === null)
 		return null;
 
 	// @ts-ignore
-	const adapter: any = ADAPTERS[`${props.rawSelected.direction === NetworkDirection.CLIENTBOUND ? 'cbound' : 'sbound'}-${NetworkStateNames[props.rawSelected.networkState]}-0x${props.rawSelected.id.toString(16).padStart(2, "0")}`];
+	const adapter: any = ADAPTERS[`${props.rawSelected.direction === NetworkDirection.CLIENTBOUND ? 'cbound' : 'sbound'}-${NetworkStateNames[props.rawSelected.networkState]}-0x${props.rawSelected.id.toString(16).toUpperCase().padStart(2, "0")}`];
 
 	return (
 		<div className={styles.container}>
@@ -73,7 +85,7 @@ const Inspector = (props: { rawSelected: IRawPacket | null | undefined; body: { 
 			<main>
 				<ul className={styles.meta}>
 					<li>
-						<b>Packet Id:</b> {"0x" + props.rawSelected.id.toString(16).padStart(2, "0")}
+						<b>Packet Id:</b> {"0x" + props.rawSelected.id.toString(16).toUpperCase().padStart(2, "0")}
 					</li>
 					<li>
 						<b>Packet category:</b> {NetworkStateNames[props.rawSelected.networkState]}
